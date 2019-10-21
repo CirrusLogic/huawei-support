@@ -1,1 +1,1 @@
-# Published files for Huawei Support
+# Published files for Product Support
