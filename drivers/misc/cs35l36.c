@@ -520,6 +520,62 @@ static int cs35l36_probe(struct cs35l36_private *cs35l36)
 			   CS35L36_SYNC_GLOBAL_OVR_MASK,
 			   0 << CS35L36_SYNC_GLOBAL_OVR_SHIFT);
 
+	// Apply ASP Config
+	if (cs35l36->pdata.asp_config.asp_fmt)
+		regmap_update_bits(cs35l36->regmap, CS35L36_ASP_FORMAT,
+				   CS35L36_ASP_FMT_MASK,
+				   cs35l36->pdata.asp_config.asp_fmt << CS35L36_ASP_FMT_SHIFT);
+
+	if (cs35l36->pdata.asp_config.asp_rx_width)
+		regmap_update_bits(cs35l36->regmap, CS35L36_ASP_FRAME_CTRL,
+				   CS35L36_ASP_RX_WIDTH_MASK,
+				   cs35l36->pdata.asp_config.asp_rx_width <<
+				   CS35L36_ASP_RX_WIDTH_SHIFT);
+
+	if (cs35l36->pdata.asp_config.asp_tx_width)
+		regmap_update_bits(cs35l36->regmap, CS35L36_ASP_FRAME_CTRL,
+				   CS35L36_ASP_TX_WIDTH_MASK,
+				   cs35l36->pdata.asp_config.asp_tx_width <<
+				   CS35L36_ASP_TX_WIDTH_SHIFT);
+
+	if (cs35l36->pdata.asp_config.asp_sample_rate)
+		regmap_update_bits(cs35l36->regmap, CS35L36_GLOBAL_CLK_CTRL,
+				   CS35L36_GLOBAL_FS_MASK,
+				   cs35l36->pdata.asp_config.asp_sample_rate <<
+				   CS35L36_GLOBAL_FS_SHIFT);
+
+	if (cs35l36->pdata.asp_config.asp_sclk_rate)
+		regmap_update_bits(cs35l36->regmap, CS35L36_ASP_TX_PIN_CTRL,
+				   CS35L36_SCLK_FREQ_MASK,
+				   cs35l36->pdata.asp_config.asp_sclk_rate);
+
+	// Apply PLL Config
+	if ((cs35l36->pdata.pll_refclk_freq & CS35L36_VALID_PDATA) |
+	    (cs35l36->pdata.pll_refclk_sel & CS35L36_VALID_PDATA)) {
+		regmap_update_bits(cs35l36->regmap, CS35L36_PLL_CLK_CTRL,
+				   CS35L36_PLL_OPENLOOP_MASK,
+				   1 << CS35L36_PLL_OPENLOOP_SHIFT);
+
+		if (cs35l36->pdata.pll_refclk_freq & CS35L36_VALID_PDATA)
+			regmap_update_bits(cs35l36->regmap, CS35L36_PLL_CLK_CTRL,
+				   CS35L36_REFCLK_FREQ_MASK,
+				   cs35l36->pdata.pll_refclk_freq << CS35L36_REFCLK_FREQ_SHIFT);
+
+		regmap_update_bits(cs35l36->regmap, CS35L36_PLL_CLK_CTRL,
+				   CS35L36_PLL_REFCLK_EN_MASK,
+				   0 << CS35L36_PLL_REFCLK_EN_SHIFT);
+		if (cs35l36->pdata.pll_refclk_freq & CS35L36_VALID_PDATA)
+			regmap_update_bits(cs35l36->regmap, CS35L36_PLL_CLK_CTRL,
+				   CS35L36_PLL_CLK_SEL_MASK,
+				   cs35l36->pdata.pll_refclk_sel);
+
+		regmap_update_bits(cs35l36->regmap, CS35L36_PLL_CLK_CTRL,
+				  CS35L36_PLL_OPENLOOP_MASK,
+				   0 << CS35L36_PLL_OPENLOOP_SHIFT);
+		regmap_update_bits(cs35l36->regmap, CS35L36_PLL_CLK_CTRL,
+				   CS35L36_PLL_REFCLK_EN_MASK,
+				   1 << CS35L36_PLL_REFCLK_EN_SHIFT);
+	}
 	return 0;
 }
 
@@ -654,7 +710,8 @@ static int cs35l36_handle_of_data(struct i2c_client *i2c_client,
 {
 	struct device_node *np = i2c_client->dev.of_node;
 	struct cs35l36_vpbr_cfg *vpbr_config = &pdata->vpbr_config;
-	struct device_node *vpbr_node;
+	struct asp_cfg *asp_config = &pdata->asp_config;
+	struct device_node *vpbr_node, *asp_node;
 	unsigned int val;
 	int ret;
 
@@ -755,6 +812,54 @@ static int cs35l36_handle_of_data(struct i2c_client *i2c_client,
 			vpbr_config->vpbr_mute_en = val;
 	}
 	of_node_put(vpbr_node);
+
+	// PLL Config
+	ret = of_property_read_u32(np, "cirrus,pll-refclk-sel", &val);
+	if (ret >= 0) {
+		val |= CS35L36_VALID_PDATA;
+		pdata->pll_refclk_sel = val;
+	}
+
+	ret = of_property_read_u32(np, "cirrus,pll-refclk-freq", &val);
+	if (ret >= 0) {
+		val |= CS35L36_VALID_PDATA;
+		pdata->pll_refclk_freq = val;
+	}
+
+	// ASP Config
+	asp_node = of_get_child_by_name(np, "cirrus,asp-config");
+	if (asp_node) {
+		ret = of_property_read_u32(asp_node, "cirrus,asp-rx-width", &val);
+		if (ret >= 0) {
+			val |= CS35L36_VALID_PDATA;
+			asp_config->asp_rx_width = val;
+		}
+
+		ret = of_property_read_u32(asp_node, "cirrus,asp-tx-width", &val);
+		if (ret >= 0) {
+			val |= CS35L36_VALID_PDATA;
+			asp_config->asp_tx_width = val;
+		}
+
+		ret = of_property_read_u32(asp_node, "cirrus,asp-fmt", &val);
+		if (ret >= 0) {
+			val |= CS35L36_VALID_PDATA;
+			asp_config->asp_fmt = val;
+		}
+
+		ret = of_property_read_u32(asp_node, "cirrus,asp-sample-rate", &val);
+		if (ret >= 0) {
+			val |= CS35L36_VALID_PDATA;
+			asp_config->asp_sample_rate = val;
+		}
+
+		ret = of_property_read_u32(asp_node, "cirrus,asp-sclk-rate", &val);
+		if (ret >= 0) {
+			val |= CS35L36_VALID_PDATA;
+			asp_config->asp_sclk_rate = val;
+		}
+	}
+	of_node_put(asp_node);
 
 	return 0;
 }

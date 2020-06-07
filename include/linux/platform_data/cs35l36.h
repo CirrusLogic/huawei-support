@@ -22,6 +22,14 @@ struct cs35l36_vpbr_cfg {
 	int vpbr_mute_en;
 };
 
+struct asp_cfg {
+	int asp_rx_width;
+	int asp_tx_width;
+	int asp_fmt;
+	int asp_sample_rate;
+	int asp_sclk_rate;
+};
+
 struct cs35l36_platform_data {
 	bool multi_amp_mode;
 	bool dcm_mode;
@@ -36,7 +44,10 @@ struct cs35l36_platform_data {
 	int temp_warn_thld;
 	int irq_drv_sel;
 	int irq_gpio_sel;
+	int pll_refclk_sel;
+	int pll_refclk_freq;
 	struct cs35l36_vpbr_cfg vpbr_config;
+	struct asp_cfg asp_config;
 };
 
 #endif /* __CS35L36_H */
