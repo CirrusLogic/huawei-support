@@ -359,6 +359,41 @@ static bool cs35l36_volatile_reg(struct device *dev, unsigned int reg)
 	}
 }
 
+static const struct reg_sequence cs35l36_spk_power_on_patch[] = {
+	{CS35L36_AMP_GAIN_CTRL, 0x00000233},
+	{CS35L36_ASP_TX1_TX2_SLOT, 0x00000002},
+	{CS35L36_ASP_RX1_SLOT, 0x00000000},
+	{CS35L36_ASP_RX_TX_EN, 0x00010003},
+	{CS35L36_PWR_CTRL2, 0x00003721},
+};
+
+static int cs35l36_spk_power_on(struct cs35l36_private *cs35l36)
+{
+	regmap_multi_reg_write(cs35l36->regmap, cs35l36_spk_power_on_patch,
+			       ARRAY_SIZE(cs35l36_spk_power_on_patch));
+
+	regmap_update_bits(cs35l36->regmap, CS35L36_PWR_CTRL1,
+			   CS35L36_GLOBAL_EN_MASK,
+			   1 << CS35L36_GLOBAL_EN_SHIFT);
+
+	usleep_range(1000, 1100);
+
+	return 0;
+}
+
+static int cs35l36_spk_power_off(struct cs35l36_private *cs35l36)
+{
+	regmap_update_bits(cs35l36->regmap, CS35L36_PWR_CTRL1,
+			   CS35L36_GLOBAL_EN_MASK,
+			   0 << CS35L36_GLOBAL_EN_SHIFT);
+
+	usleep_range(1000, 1100);
+
+	regmap_update_bits(cs35l36->regmap, CS35L36_PWR_CTRL2, 0x01, 0);
+
+	return 0;
+}
+
 static int cs35l36_boost_inductor(struct cs35l36_private *cs35l36, int inductor)
 {
 	regmap_update_bits(cs35l36->regmap, CS35L36_BSTCVRT_COEFF,
@@ -994,8 +1029,10 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 	case CS35L36_SPK_DAC_VOLUME:
 		break;
 	case CS35L36_SPK_POWER_ON:
+		ret = cs35l36_spk_power_on(cs35l36);
 		break;
 	case CS35L36_SPK_POWER_OFF:
+		ret = cs35l36_spk_power_off(cs35l36);
 		break;
 	case CS35L36_SPK_DSP_BYPASS:
 		break;
