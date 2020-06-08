@@ -1,2 +1,16 @@
 Placeholder for CSPL wrapper binaries
+.
+├ android
+│   ├ config
+│   │   ├ aurisys_config_hifi3.xml	- android configuration
+│   │   └ aurisys_config.xml
+│   ├ cspl_parser
+│   │   ├ Android.mk
+│   │   ├ lib64cspl_parser.so		- AP side 64 bit parser library
+│   │   └ libcspl_parser.so		- AP side 32 bit parser library
+│   └ param
+│       └ cspl2ctx.bin			- parameters
+├ product_v3
+│   └ libcspl_process.a			- adsp side library, release, stripped
+└ README
 
