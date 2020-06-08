@@ -16,6 +16,8 @@
 #include <linux/gpio.h>
 #include <linux/interrupt.h>
 #include <linux/miscdevice.h>
+#include <linux/ioctl.h>
+#include <linux/uaccess.h>
 #include <linux/platform_data/cs35l36.h>
 
 #include "cs35l36.h"
@@ -40,6 +42,7 @@ struct  cs35l36_private {
 	int chip_version;
 	int rev_id;
 	struct gpio_desc *reset_gpio;
+	struct mutex lock;
 	struct miscdevice misc_dev;
 };
 
@@ -971,6 +974,120 @@ static void cs35l36_apply_vpbr_config(struct cs35l36_private *cs35l36)
 			   CS35L36_VPBR_MUTE_EN_SHIFT);
 }
 
+static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
+{
+	struct miscdevice *dev = f->private_data;
+	struct cs35l36_private *cs35l36;
+	int ret = 0, val;
+
+	cs35l36 = container_of(dev, struct cs35l36_private, misc_dev);
+
+	mutex_lock(&cs35l36->lock);
+
+	if (copy_from_user(&val, arg, sizeof(val))) {
+		dev_err(cs35l36->dev, "copy from user failed\n");
+		ret = -EFAULT;
+		goto exit;
+	}
+
+	switch (cmd) {
+	case CS35L36_SPK_DAC_VOLUME:
+		break;
+	case CS35L36_SPK_POWER_ON:
+		break;
+	case CS35L36_SPK_POWER_OFF:
+		break;
+	case CS35L36_SPK_DSP_BYPASS:
+		break;
+	case CS35L36_SPK_SWITCH_CALIBRATION:
+		break;
+	case CS35L36_SPK_SWITCH_CONFIGURATION:
+		break;
+	case CS35L36_SPK_SWITCH_FIRMWARE:
+		break;
+	case CS35L36_SPK_GET_R0:
+		break;
+	case CS35L36_SPK_GET_F0:
+		break;
+	case CS35L36_SPK_GET_CAL_STRUCT:
+		break;
+	case CS35L36_SPK_SET_CAL_STRUCT:
+		break;
+	case CS35L36_SPK_SET_AMBIENT:
+		break;
+	default:
+		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
+		return -EINVAL;
+	}
+
+exit:
+	mutex_unlock(&cs35l36->lock);
+
+	return ret;
+}
+
+static long cs35l36_unlocked_ioctl(struct file *f, unsigned int cmd,
+								   unsigned long arg)
+{
+	return cs35l36_ioctl(f, cmd, (void __user *)arg);
+}
+
+#ifdef CONFIG_COMPAT
+static long cs35l36_compat_ioctl(struct file *f, unsigned int cmd,
+								 unsigned long arg)
+{
+	struct miscdevice *dev = f->private_data;
+	struct cs35l36_private *cs35l36;
+	unsigned int cmd64;
+
+	cs35l36 = container_of(dev, struct cs35l36_private, misc_dev);
+
+	switch (cmd) {
+	case CS35L36_SPK_DAC_VOLUME_COMPAT:
+		cmd64 = CS35L36_SPK_DAC_VOLUME;
+		break;
+	case CS35L36_SPK_POWER_ON_COMPAT:
+		cmd64 = CS35L36_SPK_POWER_ON;
+		break;
+	case CS35L36_SPK_POWER_OFF_COMPAT:
+		cmd64 = CS35L36_SPK_POWER_OFF;
+		break;
+	case CS35L36_SPK_DSP_BYPASS_COMPAT:
+		cmd64 = CS35L36_SPK_DSP_BYPASS;
+		break;
+	case CS35L36_SPK_SWITCH_CONFIGURATION_COMPAT:
+		cmd64 = CS35L36_SPK_SWITCH_CONFIGURATION;
+		break;
+	case CS35L36_SPK_SWITCH_CALIBRATION_COMPAT:
+		cmd64 = CS35L36_SPK_SWITCH_CALIBRATION;
+		break;
+	case CS35L36_SPK_GET_R0_COMPAT:
+		cmd64 = CS35L36_SPK_GET_R0;
+		break;
+	case CS35L36_SPK_GET_F0_COMPAT:
+		cmd64 = CS35L36_SPK_GET_F0;
+		break;
+	case CS35L36_SPK_GET_CAL_STRUCT_COMPAT:
+		cmd64 = CS35L36_SPK_GET_CAL_STRUCT;
+		break;
+	case CS35L36_SPK_SET_CAL_STRUCT_COMPAT:
+		cmd64 = CS35L36_SPK_SET_CAL_STRUCT;
+		break;
+	case CS35L36_SPK_SET_AMBIENT_COMPAT:
+		cmd64 = CS35L36_SPK_SET_AMBIENT;
+		break;
+	case CS35L36_SPK_SWITCH_FIRMWARE_COMPAT:
+		cmd64 = CS35L36_SPK_SWITCH_FIRMWARE;
+		break;
+	default:
+		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
+		return -EINVAL;
+	}
+
+	return cs35l36_ioctl(f, cmd64, compat_ptr(arg));
+}
+#endif
+
 static const struct reg_sequence cs35l36_reva0_errata_patch[] = {
 	{ CS35L36_TESTKEY_CTRL,		CS35L36_TEST_UNLOCK1 },
 	{ CS35L36_TESTKEY_CTRL,		CS35L36_TEST_UNLOCK2 },
@@ -1028,6 +1145,10 @@ static const struct reg_sequence cs35l36_revb0_errata_patch[] = {
 
 static const struct file_operations cs35l36_fops = {
 	.owner = THIS_MODULE,
+	.unlocked_ioctl = cs35l36_unlocked_ioctl,
+#ifdef CONFIG_COMPAT
+	.compat_ioctl = cs35l36_compat_ioctl,
+#endif
 };
 
 static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
