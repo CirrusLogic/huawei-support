@@ -42,6 +42,7 @@ struct  cs35l36_private {
 	int chip_version;
 	int rev_id;
 	struct gpio_desc *reset_gpio;
+	struct gpio_desc *irq_gpio;
 	struct mutex lock;
 	struct miscdevice misc_dev;
 };
@@ -1194,9 +1195,9 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	struct cs35l36_private *cs35l36;
 	struct device *dev = &i2c_client->dev;
 	struct cs35l36_platform_data *pdata = dev_get_platdata(dev);
-	struct irq_data *irq_d;
 	int ret, irq_pol, chip_irq_pol, i;
 	u32 reg_id, reg_revid, l37_id_reg;
+	int irq_gpio = 0;
 
 	cs35l36 = devm_kzalloc(dev, sizeof(struct cs35l36_private), GFP_KERNEL);
 	if (!cs35l36)
@@ -1332,14 +1333,24 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	if (pdata->vpbr_config.is_present)
 		cs35l36_apply_vpbr_config(cs35l36);
 
-	irq_d = irq_get_irq_data(i2c_client->irq);
-	if (!irq_d) {
-		dev_err(&i2c_client->dev, "Invalid IRQ: %d\n", i2c_client->irq);
-		ret = -ENODEV;
-		goto err;
+	cs35l36->irq_gpio = devm_gpiod_get_optional(dev, "irq", GPIOD_IN);
+	if (IS_ERR(cs35l36->irq_gpio)) {
+		ret = PTR_ERR(cs35l36->irq_gpio);
+		cs35l36->irq_gpio = NULL;
+		if (ret == -EBUSY) {
+			dev_info(dev, "Reset line busy, assuming shared reset\n");
+		} else {
+			dev_err(dev, "Failed to get irq GPIO: %d\n", ret);
+			goto err_disable_regs;
+		}
 	}
 
-	irq_pol = irqd_get_trigger_type(irq_d);
+	if (cs35l36->irq_gpio) {
+		irq_gpio = gpiod_to_irq(cs35l36->irq_gpio);
+		dev_info(dev, "gpiod_to_irq ret: %d\n", irq_gpio);
+
+		irq_pol = IRQF_TRIGGER_LOW;
+	}
 
 	switch (irq_pol) {
 	case IRQF_TRIGGER_FALLING:
@@ -1360,7 +1371,7 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 			   CS35L36_INT_POL_SEL_MASK,
 			   chip_irq_pol << CS35L36_INT_POL_SEL_SHIFT);
 
-	ret = devm_request_threaded_irq(dev, i2c_client->irq, NULL, cs35l36_irq,
+	ret = devm_request_threaded_irq(dev, irq_gpio, NULL, cs35l36_irq,
 					IRQF_ONESHOT | irq_pol, "cs35l36",
 					cs35l36);
 	if (ret != 0) {
