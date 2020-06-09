@@ -1262,8 +1262,12 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 		}
 	}
 
-	if (cs35l36->reset_gpio)
+	if (cs35l36->reset_gpio) {
 		gpiod_set_value_cansleep(cs35l36->reset_gpio, 1);
+		usleep_range(2000, 2100);
+		gpiod_set_value_cansleep(cs35l36->reset_gpio, 0);
+		usleep_range(1000, 1100);
+	}
 
 	usleep_range(2000, 2100);
 
