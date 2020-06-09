@@ -1197,6 +1197,7 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	struct cs35l36_platform_data *pdata = dev_get_platdata(dev);
 	int ret, irq_pol, chip_irq_pol, i;
 	u32 reg_id, reg_revid, l37_id_reg;
+	struct smartpa_vendor_info vendor_info;
 	int irq_gpio = 0;
 
 	cs35l36 = devm_kzalloc(dev, sizeof(struct cs35l36_private), GFP_KERNEL);
@@ -1412,6 +1413,14 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	}
 
 	dev_info(dev, "Register misc driver successful\n");
+
+	vendor_info.vendor = VENDOR_ID_CIRRUS;
+	vendor_info.chip_model = "cs35l36";
+	ret = smartpakit_set_info(&vendor_info);
+	if (ret != 0) {
+		dev_err(dev, "cs35l36 failed to smartpakit_set_info: %d\n", ret);
+		goto err;
+	}
 
 	return 0;
 
