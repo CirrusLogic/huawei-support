@@ -359,21 +359,6 @@ static bool cs35l36_volatile_reg(struct device *dev, unsigned int reg)
 	}
 }
 
-static const struct reg_sequence cs35l36_pup_patch[] = {
-	{CS35L36_TESTKEY_CTRL, 0x00005555},
-	{CS35L36_TESTKEY_CTRL, 0x0000AAAA},
-	{0x00007850, 0x00002FA9},
-	{0x00007854, 0x0003F1D5},
-	{0x00007858, 0x0003F5E3},
-	{0x0000785C, 0x00001137},
-	{0x00007860, 0x0001A7A5},
-	{0x00007864, 0x0002F16A},
-	{0x00007868, 0x00003E21},
-	{0x00007848, 0x00000001},
-	{CS35L36_TESTKEY_CTRL, 0x0000CCCC},
-	{CS35L36_TESTKEY_CTRL, 0x00003333},
-};
-
 static const struct reg_sequence cs35l36_spk_power_on_patch[] = {
 	{CS35L36_AMP_GAIN_CTRL, 0x00000233},
 	{CS35L36_ASP_TX1_TX2_SLOT, 0x00000002},
@@ -384,9 +369,6 @@ static const struct reg_sequence cs35l36_spk_power_on_patch[] = {
 
 static int cs35l36_spk_power_on(struct cs35l36_private *cs35l36)
 {
-	regmap_multi_reg_write_bypassed(cs35l36->regmap, cs35l36_pup_patch,
-					ARRAY_SIZE(cs35l36_pup_patch));
-
 	regmap_multi_reg_write(cs35l36->regmap, cs35l36_spk_power_on_patch,
 			       ARRAY_SIZE(cs35l36_spk_power_on_patch));
 
