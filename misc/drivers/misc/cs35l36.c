@@ -18,9 +18,15 @@
 #include <linux/miscdevice.h>
 #include <linux/ioctl.h>
 #include <linux/uaccess.h>
-#include <linux/platform_data/cs35l36.h>
+#ifdef CONFIG_COMPAT
+#include <linux/compat.h>
+#endif
 
+#include <linux/platform_data/cs35l36.h>
 #include "cs35l36.h"
+
+#include "smartpakit.h"
+#define VENDOR_ID_CIRRUS 3
 
 /*
  * Some fields take zero as a valid value so use a high bit flag that won't
