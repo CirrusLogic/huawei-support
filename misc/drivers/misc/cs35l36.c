@@ -18,9 +18,15 @@
 #include <linux/miscdevice.h>
 #include <linux/ioctl.h>
 #include <linux/uaccess.h>
-#include <linux/platform_data/cs35l36.h>
+#ifdef CONFIG_COMPAT
+#include <linux/compat.h>
+#endif
 
+#include <linux/platform_data/cs35l36.h>
 #include "cs35l36.h"
+
+#include "smartpakit.h"
+#define VENDOR_ID_CIRRUS 3
 
 /*
  * Some fields take zero as a valid value so use a high bit flag that won't
@@ -42,6 +48,7 @@ struct  cs35l36_private {
 	int chip_version;
 	int rev_id;
 	struct gpio_desc *reset_gpio;
+	struct gpio_desc *irq_gpio;
 	struct mutex lock;
 	struct miscdevice misc_dev;
 };
@@ -359,21 +366,6 @@ static bool cs35l36_volatile_reg(struct device *dev, unsigned int reg)
 	}
 }
 
-static const struct reg_sequence cs35l36_pup_patch[] = {
-	{CS35L36_TESTKEY_CTRL, 0x00005555},
-	{CS35L36_TESTKEY_CTRL, 0x0000AAAA},
-	{0x00007850, 0x00002FA9},
-	{0x00007854, 0x0003F1D5},
-	{0x00007858, 0x0003F5E3},
-	{0x0000785C, 0x00001137},
-	{0x00007860, 0x0001A7A5},
-	{0x00007864, 0x0002F16A},
-	{0x00007868, 0x00003E21},
-	{0x00007848, 0x00000001},
-	{CS35L36_TESTKEY_CTRL, 0x0000CCCC},
-	{CS35L36_TESTKEY_CTRL, 0x00003333},
-};
-
 static const struct reg_sequence cs35l36_spk_power_on_patch[] = {
 	{CS35L36_AMP_GAIN_CTRL, 0x00000233},
 	{CS35L36_ASP_TX1_TX2_SLOT, 0x00000002},
@@ -384,9 +376,6 @@ static const struct reg_sequence cs35l36_spk_power_on_patch[] = {
 
 static int cs35l36_spk_power_on(struct cs35l36_private *cs35l36)
 {
-	regmap_multi_reg_write_bypassed(cs35l36->regmap, cs35l36_pup_patch,
-					ARRAY_SIZE(cs35l36_pup_patch));
-
 	regmap_multi_reg_write(cs35l36->regmap, cs35l36_spk_power_on_patch,
 			       ARRAY_SIZE(cs35l36_spk_power_on_patch));
 
@@ -1212,9 +1201,10 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	struct cs35l36_private *cs35l36;
 	struct device *dev = &i2c_client->dev;
 	struct cs35l36_platform_data *pdata = dev_get_platdata(dev);
-	struct irq_data *irq_d;
 	int ret, irq_pol, chip_irq_pol, i;
 	u32 reg_id, reg_revid, l37_id_reg;
+	struct smartpa_vendor_info vendor_info;
+	int irq_gpio = 0;
 
 	cs35l36 = devm_kzalloc(dev, sizeof(struct cs35l36_private), GFP_KERNEL);
 	if (!cs35l36)
@@ -1279,8 +1269,12 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 		}
 	}
 
-	if (cs35l36->reset_gpio)
+	if (cs35l36->reset_gpio) {
 		gpiod_set_value_cansleep(cs35l36->reset_gpio, 1);
+		usleep_range(2000, 2100);
+		gpiod_set_value_cansleep(cs35l36->reset_gpio, 0);
+		usleep_range(1000, 1100);
+	}
 
 	usleep_range(2000, 2100);
 
@@ -1350,14 +1344,24 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	if (pdata->vpbr_config.is_present)
 		cs35l36_apply_vpbr_config(cs35l36);
 
-	irq_d = irq_get_irq_data(i2c_client->irq);
-	if (!irq_d) {
-		dev_err(&i2c_client->dev, "Invalid IRQ: %d\n", i2c_client->irq);
-		ret = -ENODEV;
-		goto err;
+	cs35l36->irq_gpio = devm_gpiod_get_optional(dev, "irq", GPIOD_IN);
+	if (IS_ERR(cs35l36->irq_gpio)) {
+		ret = PTR_ERR(cs35l36->irq_gpio);
+		cs35l36->irq_gpio = NULL;
+		if (ret == -EBUSY) {
+			dev_info(dev, "Reset line busy, assuming shared reset\n");
+		} else {
+			dev_err(dev, "Failed to get irq GPIO: %d\n", ret);
+			goto err_disable_regs;
+		}
 	}
 
-	irq_pol = irqd_get_trigger_type(irq_d);
+	if (cs35l36->irq_gpio) {
+		irq_gpio = gpiod_to_irq(cs35l36->irq_gpio);
+		dev_info(dev, "gpiod_to_irq ret: %d\n", irq_gpio);
+
+		irq_pol = IRQF_TRIGGER_LOW;
+	}
 
 	switch (irq_pol) {
 	case IRQF_TRIGGER_FALLING:
@@ -1378,7 +1382,7 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 			   CS35L36_INT_POL_SEL_MASK,
 			   chip_irq_pol << CS35L36_INT_POL_SEL_SHIFT);
 
-	ret = devm_request_threaded_irq(dev, i2c_client->irq, NULL, cs35l36_irq,
+	ret = devm_request_threaded_irq(dev, irq_gpio, NULL, cs35l36_irq,
 					IRQF_ONESHOT | irq_pol, "cs35l36",
 					cs35l36);
 	if (ret != 0) {
@@ -1415,6 +1419,14 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 	}
 
 	dev_info(dev, "Register misc driver successful\n");
+
+	vendor_info.vendor = VENDOR_ID_CIRRUS;
+	vendor_info.chip_model = "cs35l36";
+	ret = smartpakit_set_info(&vendor_info);
+	if (ret != 0) {
+		dev_err(dev, "cs35l36 failed to smartpakit_set_info: %d\n", ret);
+		goto err;
+	}
 
 	return 0;
 
