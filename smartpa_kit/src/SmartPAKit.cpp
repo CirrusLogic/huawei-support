@@ -121,20 +121,6 @@ void CirrusSmartPAKit::dumpReg(void)
     delete(filename);
 }
 
-int CirrusSmartPAKit::loadCoef(char *product_name, double *coef_range)
-{
-    ALOGD("%s", __func__);
-
-    return 0;
-}
-
-int CirrusSmartPAKit::setAlgoScene(unsigned int algo_scene)
-{
-    ALOGD("%s: %x", __func__, algo_scene);
-
-    return 0;
-}
-
 int CirrusSmartPAKit::speakerOn(unsigned int scene)
 {
     ALOGD("%s: %x", __func__, scene);
@@ -165,6 +151,46 @@ int CirrusSmartPAKit::speakerOff(unsigned int scene)
     return ret;
 }
 
+void CirrusSmartPAKit::setCalibValue(unsigned int re)
+{
+    ALOGD("%s: %u", __func__, re);
+
+    mReValue = re;
+
+    ALOGD("%s: Set calibration value to %d", __func__, mReValue);
+}
+
+int CirrusSmartPAKit::getDefaultCalibState(void)
+{
+    ALOGD("%s", __func__);
+
+    int state = 0;
+    int ret;
+
+    ret = sendIoctlCmd(CS35L36_SPK_GET_CALIB_STATE, &state);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_GET_CALIB_STATE failed (%d)", __func__, ret);
+        return ret;
+    }
+
+    return state;
+}
+
+void CirrusSmartPAKit::setDefaultCalibValue(int value)
+{
+    ALOGD("%s", __func__);
+
+    int ret;
+
+    ret = sendIoctlCmd(CS35L36_SPK_SET_DEFAULT_CALIB, &value);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_GET_CALIB_STATE failed (%d)", __func__, ret);
+        return;
+    }
+
+    ALOGD("%s: Set default calibration value to %d success", __func__, value);
+}
+
 // optional
 int CirrusSmartPAKit::getTemprature(int *temprature_array)
 {
@@ -179,11 +205,6 @@ void CirrusSmartPAKit::startCalib(void)
 }
 
 void CirrusSmartPAKit::stopCalib(void)
-{
-    ALOGD("%s", __func__);
-}
-
-void CirrusSmartPAKit::setCalibValue(void *param, unsigned int param_len)
 {
     ALOGD("%s", __func__);
 }

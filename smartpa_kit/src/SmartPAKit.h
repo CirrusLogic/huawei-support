@@ -46,10 +46,12 @@ public:
 
     void dumpReg(void);
 
-    int loadCoef(char *product_name, double *coef_range);
-    int setAlgoScene(unsigned int algo_scene);
     int speakerOn(unsigned int scene);
     int speakerOff(unsigned int scene);
+
+    void setCalibValue(unsigned int re);
+    int getDefaultCalibState(void);
+    void setDefaultCalibValue(int value);
 
     // Optional
     int getTemprature(int *temprature_array);
@@ -63,6 +65,7 @@ private:
 
     int mDevFd;
     bool mIsDSPBypass;
+    unsigned int mReValue;
 
     int sendIoctlCmd(unsigned int cmd, void *arg);
 };
