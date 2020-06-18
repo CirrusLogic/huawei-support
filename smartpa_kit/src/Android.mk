@@ -25,10 +25,12 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libsmartpakit
 LOCAL_VENDOR_MODULE := true
 LOCAL_MODULE_TAGS := optional
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/../include
 
 LOCAL_CFLAGS += -Werror -Wno-error=unused-parameter -Wno-unused-parameter -Wall
 
 LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH)/../include \
 	$(LOCAL_PATH)/include-all
 
 LOCAL_SRC_FILES := \

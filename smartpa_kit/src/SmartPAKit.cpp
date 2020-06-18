@@ -24,11 +24,14 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
-#include "SmartPAKit.h"
+#include <vendor/cirrus/smartpa_kit/SmartPAKit.h>
 
 #define DEVICE_NAME "/dev/cs35l36"
 #define DEVICE_ADDRESS "1-0040"
+
+cirrus::CirrusSmartPAKit* g_smartpa_inst;
 
 namespace cirrus {
 

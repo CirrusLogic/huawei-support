@@ -23,14 +23,14 @@
 #ifndef CIRRUS_SMARTPA_H
 #define CIRRUS_SMARTPA_H
 
-#include "cs35l36.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <vendor/cirrus/smartpa_kit/cs35l36.h>
 
 namespace cirrus {
 
-/**
- * A class opening the given compress device, reading back the compressed
- * stream and printing the data in logcat.
- */
 class CirrusSmartPAKit {
 public:
     CirrusSmartPAKit();
@@ -57,7 +57,6 @@ public:
     int getTemprature(int *temprature_array);
     void startCalib(void);
     void stopCalib(void);
-    void setCalibValue(void *param, unsigned int param_len);
     void bypassDSP(bool bypass);
 
 private:
@@ -71,4 +70,9 @@ private:
 };
 
 } //namespace cirrus
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //CIRRUS_SMARTPA_H
