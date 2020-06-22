@@ -1,0 +1,41 @@
+Step-by-Step Integration Instructions
+
+1. Add Cirrus Logic Source to the Android Build Environment
+  The Cirrus Logic components should be installed under vendor/cirrus in the
+  Android build environment.
+
+  Component: SmartPA Kit HAL
+  Source Location in Android Build Environment: vendor/cirrus/smartpa_kit
+
+2. Add the Cirrus Logic SmartPA Kit HAL and Dependencies to the Build
+  Add the following lines to the device.mk file:
+
+  PRODUCT_PACKAGES += \
+      libsmartpakit \
+
+3. Integrate into the customer SmartPA Kit
+  Include the header file into the customer SmartPA Kit source:
+  #include <vendor/cirrus/smartpa_kit/SmartPAKit.h>
+
+  Create a CirrusSmartPAKit instance from the customer SmartPA Kit entry point,
+  and call Call the library entry point:
+  static int smarpa_init(char *cnt_file_name)
+  {
+      int ret;
+      cirrus::CirrusSmartPAKit* smartpa_inst = new cirrus::CirrusSmartPAKit();
+      ret = smartpa_inst->init();
+      if (ret != 0)
+      return ret;
+      /* rest of SmartPA Kit initialization */
+  }
+
+  Example of using the Cirrus Logic smartPA kit library implementation:
+
+  static int select_smartpa_scene(unsigned int reg_scene)
+  {
+      if (reg_scene  == POWER_ON_L)
+          smartpa_inst->speakerOn(MUSIC);
+
+      if (reg_scene  == POWER_OFF_L)
+          smartpa_inst->speakerOff(MUSIC);
+  }

@@ -1,0 +1,392 @@
+CS35L36 Speaker Amplifier
+
+Required properties:
+
+  - compatible : "cirrus,cs35l36"
+
+  - reg : the I2C address of the device for I2C
+
+  - VA-supply, VP-supply : power supplies for the device,
+  as covered in
+  Documentation/devicetree/bindings/regulator/regulator.txt.
+
+  - cirrus,boost-ctl-millivolt : Boost Voltage Value.  Configures the boost
+  converter's output voltage in mV. The range is from 2550mV to 12000mV with
+  increments of 50mV.
+  (Default) VP
+
+  - cirrus,boost-peak-milliamp : Boost-converter peak current limit in mA.
+  Configures the peak current by monitoring the current through the boost FET.
+  Range starts at 1600mA and goes to a maximum of 4500mA with increments of
+  50mA.
+  (Default) 4.50 Amps
+
+  - cirrus,boost-ind-nanohenry : Inductor estimation LBST reference value.
+  Seeds the digital boost converter's inductor estimation block with the initial
+  inductance value to reference.
+
+  1000 = 1uH (Default)
+  1200 = 1.2uH
+
+Optional properties:
+  - cirrus,multi-amp-mode : Boolean to determine if there are more than
+  one amplifier in the system. If more than one it is best to Hi-Z the ASP
+  port to prevent bus contention on the output signal
+
+  - cirrus,boost-ctl-select : Boost conerter control source selection.
+  Selects the source of the BST_CTL target VBST voltage for the boost
+  converter to generate.
+  0x00 - Control Port Value
+  0x01 - Class H Tracking (Default)
+  0x10 - MultiDevice Sync Value
+
+  - cirrus,amp-pcm-inv : Boolean to determine Amplifier will invert incoming
+  PCM data
+
+  - cirrus,imon-pol-inv : Boolean to determine Amplifier will invert the
+  polarity of outbound IMON feedback data
+
+  - cirrus,vmon-pol-inv : Boolean to determine Amplifier will invert the
+  polarity of outbound VMON feedback data
+
+  - cirrus,dcm-mode-enable : Boost converter automatic DCM Mode enable.
+  This enables the digital boost converter to operate in a low power
+  (Discontinuous Conduction) mode during low loading conditions.
+
+  - cirrus,weak-fet-disable : Boolean : The strength of the output drivers is
+  reduced when operating in a Weak-FET Drive Mode and must not be used to drive
+  a large load.
+
+  - cirrus,classh-wk-fet-delay :  Weak-FET entry delay. Controls the delay
+  (in ms) before the Class H algorithm switches to the weak-FET voltage
+  (after the audio falls and remains below the value specified in WKFET_AMP_THLD).
+
+  0 = 0ms
+  1 = 5ms
+  2 = 10ms
+  3 = 50ms
+  4 = 100ms (Default)
+  5 = 200ms
+  6 = 500ms
+  7 = 1000ms
+
+  - cirrus,classh-weak-fet-thld-millivolt : Weak-FET amplifier drive threshold.
+  Configures the signal threshold at which the PWM output stage enters
+  weak-FET operation. The range is 50mV to 700mV in 50mV increments.
+
+  - cirrus,temp-warn-threshold :  Amplifier overtemperature warning threshold.
+  Configures the threshold at which the overtemperature warning condition occurs.
+  When the threshold is met, the overtemperature warning attenuation is applied
+  and the TEMP_WARN_EINT interrupt status bit is set.
+  If TEMP_WARN_MASK = 0, INTb is asserted.
+
+  0 = 105C
+  1 = 115C
+  2 = 125C (Default)
+  3 = 135C
+
+  - cirrus,irq-drive-select : Selects the driver type of the selected interrupt
+  output.
+
+  0 = Open-drain
+  1 = Push-pull (Default)
+
+  - cirrus,irq-gpio-select : Selects the pin to serve as the programmable
+  interrupt output.
+
+  0 = PDM_DATA / SWIRE_SD / INT (Default)
+  1 = GPIO
+
+  - cirrus,pll-refclk-sel : Selects the reference clock the device uses to
+  generate an internal master clock.
+
+  0 = SCLK input (Default)
+  1 = LRCK input
+  2 = Reserve
+  3 = Self-clock
+  4 = PDM_CLK input
+  5 = MCLK input
+  6 = Reserved
+  7 = SWIRE_CLK (IP recovered clock)
+
+  - cirrus,pll-refclk-freq : PLL input reference clock frequency. This value
+  must match the input frequency present at the selected REFCLK source in order
+  to properly configure the internal clocking of the device.
+
+  0 = 32768 Hz
+  1 = 8000 Hz
+  2 = 11025 Hz
+  3 = 12000 Hz
+  4 = 16000 Hz
+  5 = 22050 Hz
+  6 = 24000 Hz
+  7 = 32000 Hz
+  8 = 44100 Hz
+  9 = 48000 Hz
+  10 = 88200 Hz
+  11 = 96000 Hz
+  12 = 128000 Hz
+  13 = 176400 Hz
+  14 = 192000 Hz
+  15 = 256000 Hz
+  16 = 352800 Hz
+  17 = 384000 Hz
+  18 = 512000 Hz
+  19 = 705600 Hz
+  20 = 750000 Hz
+  21 = 768000 Hz
+  22 = 1000000 Hz
+  23 = 1024000 Hz
+  24 = 1200000 Hz
+  25 = 1411200 Hz
+  26 = 1500000 Hz
+  27 = 1536000 Hz
+  28 = 2000000 Hz (Default)
+  29 = 2048000 Hz
+  30 = 2400000 Hz
+  31 = 2822400 Hz
+  32 = 3000000 Hz
+  33 = 3072000 Hz
+  34 = 3200000 Hz
+  35 = 4000000 Hz
+  36 = 4096000 Hz
+  37 = 4800000 Hz
+  38 = 5644800 Hz
+  39 = 6000000 Hz
+  40 = 6144000 Hz
+  41 = 6250000 Hz
+  42 = 6400000 Hz
+  43 = 6500000 Hz
+  44 = 6750000 Hz
+  45 = 7526400 Hz
+  46 = 8000000 Hz
+  47 = 8192000 Hz
+  48 = 9600000 Hz
+  49 = 11289600 Hz
+  50 = 12000000 Hz
+  51 = 12288000 Hz
+  52 = 12500000 Hz
+  53 = 12800000 Hz
+  54 = 13000000 Hz
+  55 = 13500000 Hz
+  56 = 19200000 Hz
+  57 = 22579200 Hz
+  58 = 24000000 Hz
+  59 = 24576000 Hz
+  60 = 25000000 Hz
+  61 = 25600000 Hz
+  62 = 26000000 Hz
+  63 = 27000000 Hz
+
+Optional properties for the "cirrus,vpbr-config" Sub-node
+
+  - cirrus,vpbr-en : VBST brownout prevention enable. Configures whether the
+  VBST brownout prevention algorithm is enabled or disabled.
+
+  0 = VBST brownout prevention disabled (default)
+  1 = VBST brownout prevention enabled
+
+  See Section 7.31.1 VPBR Config for configuration options & further details
+
+  - cirrus,vpbr-thld : Initial VPBR threshold. Configures the VP brownout
+  threshold voltage
+
+  - cirrus,cirrus,vpbr-atk-rate : Attenuation attack step rate. Configures the
+  amount delay between consecutive volume attenuation steps when a brownout
+  condition is present and the VP brownout condition is in an attacking state.
+
+  - cirrus,vpbr-atk-vol : VP brownout prevention step size. Configures the VP
+  brownout prevention attacking attenuation step size when operating in either
+  digital volume or analog gain modes.
+
+  - cirrus,vpbr-max-attn : Maximum attenuation that the VP brownout prevention
+  can apply to the audio signal.
+
+  - cirrus,vpbr-wait : Configures the delay time between a brownout condition
+  no longer being present and the VP brownout prevention entering an attenuation
+  release state.
+
+  - cirrus,vpbr-rel-rate : Attenuation release step rate. Configures the delay
+  between consecutive volume attenuation release steps when a brownout condition
+  is not longer present and the VP brownout is in an attenuation release state.
+
+  - cirrus,vpbr-mute-en : During the attack state, if the vpbr-max-attn value
+  is reached, the error condition still remains, and this bit is set, the audio
+  is muted.
+
+Optional properties for the "cirrus,asp-config" Sub-node
+
+  - cirrus,asp-rx-width : Audio serial port RX slot width and data width.
+  Configures the number of SCLK cycles per RX slot. Slot width is valid from 12
+  to 128; data width is valid from 12 to 24.
+
+  12 = Slot width: 12, data width: 12
+  13 = Slot width: 13, data width: 13
+  14 = Slot width: 14, data width: 14
+  15 = Slot width: 15, data width: 15
+  16 = Slot width: 16, data width: 16
+  17 = Slot width: 17, data width: 17
+  18 = Slot width: 18, data width: 18 (Default)
+  19 = Slot width: 19, data width: 19
+  20 = Slot width: 20, data width: 20
+  21 = Slot width: 21, data width: 21
+  22 = Slot width: 22, data width: 22
+  23 = Slot width: 23, data width: 23
+  24 = Slot width: 24, data width: 24
+  25 = Slot width: 25, data width: 24
+  ...
+  128 = Slot width: 128, data width: 24
+
+  - cirrus,asp-tx-width : Audio serial port TX slot width and data width.
+  Configures the number of SCLK cycles per TX slot. Slot width is valid from 12
+  to 128; data width is valid from 12 to 24.
+
+  12 = Slot width: 12, data width: 12
+  13 = Slot width: 13, data width: 13
+  14 = Slot width: 14, data width: 14
+  15 = Slot width: 15, data width: 15
+  16 = Slot width: 16, data width: 16
+  17 = Slot width: 17, data width: 17
+  18 = Slot width: 18, data width: 18 (Default)
+  19 = Slot width: 19, data width: 19
+  20 = Slot width: 20, data width: 20
+  21 = Slot width: 21, data width: 21
+  22 = Slot width: 22, data width: 22
+  23 = Slot width: 23, data width: 23
+  24 = Slot width: 24, data width: 24
+  25 = Slot width: 25, data width: 24
+  ...
+  128 = Slot width: 128, data width: 24
+
+  - cirrus,asp-fmt : Audio serial port interface format. This field is locked
+  when any serial port channels are enabled. Disable all audio serial port
+  channels (ASP_x_EN) prior to changing the configured format.
+
+  0 = TDM 1 (DSP Mode A)
+  1 = TDM 0 (DSP Mode B)
+  2 = I2S mode (Default)
+  3 = Left Justified mode
+  4 = TDM 1.5 (TDM 1 with RX LRCK is relative to the negative edge of SCLK)
+
+  - cirrus,asp-sample-rate : Serial port and/or SoundWire sample rate frequency.
+  Configures the global sample rate of the serial port (I2S/TDM) or SoundWire.
+
+  0 = Reserved
+  1 = 12.0 kHz
+  2 = 24.0 kHz
+  3 = 48.0 kHz (Default)
+  4 = 96.0 kHz
+  5 = 192.0 kHz
+  8 = Reserved
+  9 = 11.025 kHz
+  10 = 22.050 kHz
+  11 = 44.100 kHz
+  12 = 88.200 kHz
+  13 = 176.400 kHz
+  16 = Reserved
+  17 = 8 kHz
+  18 = 16 kHz
+  19 = 32 kHz
+  31 = Reserved
+  6 = 384.0kHz
+
+  - cirrus,asp-sclk-rate : Audio serial port SCLK master mode rate. When
+  operating in SCLK master mode (ASP_SCLK_MSTR = 1), ASP_SCLK_FREQ is used
+  together with the system's sample rate setting to derive the LRCK divide
+  ratio.
+
+  12 = 128,000
+  13 = 176,400
+  14 = 192,000
+  15 = 256,000
+  16 = 352,800
+  17 = 384,000
+  18 = 512,000
+  19 = 705,600
+  20 = 750,000
+  21 = 768,000
+  22 = 1,000,000
+  23 = 1,024,000
+  24 = 1,200,000
+  25 = 1,411,200
+  26 = 1,500,000
+  27 = 1,536,000
+  28 = 2,000,000 (Default)
+  29 = 2,048,000
+  30 = 2,400,000
+  31 = 2,822,400
+  32 = 3,000,000
+  33 = 3,072,000
+  34 = 3,200,000
+  35 = 4,000,000
+  36 = 4,096,000
+  37 = 4,800,000
+  38 = 5,644,800
+  39 = 6,000,000
+  40 = 6,144,000
+  41 = 6,250,000
+  42 = 6,400,000
+  43 = 6,500,000
+  44 = 6,750,000
+  45 = 7,526,400
+  46 = 8,000,000
+  47 = 8,192,000
+  48 = 9,600,000
+  49 = 11,289,600
+  50 = 12,000,000
+  51 = 12,288,000
+  52 = 12,500,000
+  53 = 12,800,000
+  54 = 13,000,000
+  55 = 13,500,000
+  56 = 19,200,000
+  57 = 22,579,200
+  58 = 24,000,000
+  59 = 24,576,000
+  60 = 25,000,000
+  61 = 25,600,000
+  62 = 26,000,000
+  63 = 27,000,000
+
+Example:
+
+cs35l36: cs35l36@40 {
+	compatible = "cirrus,cs35l36";
+	reg = <0x40>;
+	VA-supply = <&dummy_vreg>;
+	VP-supply = <&dummy_vreg>;
+	reset-gpios = <&gpio 6 0>;
+	irq-gpios = <&gpio 12 IRQ_TYPE_LEVEL_LOW>;
+
+	cirrus,boost-ind-nanohenry = <1000>;
+	cirrus,boost-ctl-millivolt = <10000>;
+	cirrus,boost-peak-milliamp = <4500>;
+	cirrus,boost-ctl-select = <0x00>;
+	cirrus,weak-fet-delay = <0x04>;
+	cirrus,weak-fet-thld = <0x01>;
+	cirrus,temp-warn-threshold = <0x01>;
+	cirrus,multi-amp-mode;
+	cirrus,irq-drive-select = <0x01>;
+	cirrus,irq-gpio-select = <0x01>;
+	cirrus,pll-refclk-sel = <0x0>;
+	cirrus,pll-refclk-freq = <0x21>;
+
+	cirrus,vpbr-config {
+		cirrus,vpbr-en = <0x00>;
+		cirrus,vpbr-thld = <0x05>;
+		cirrus,vpbr-atk-rate = <0x02>;
+		cirrus,vpbr-atk-vol = <0x01>;
+		cirrus,vpbr-max-attn = <0x09>;
+		cirrus,vpbr-wait = <0x01>;
+		cirrus,vpbr-rel-rate = <0x05>;
+		cirrus,vpbr-mute-en = <0x00>;
+	};
+
+	cirrus,asp-config {
+		cirrus,asp-rx-width = <0x20>;
+		cirrus,asp-tx-width = <0x10>;
+		cirrus,asp-fmt = <0x02>;
+		cirrus,asp-sample-rate = <0x03>;
+		cirrus,asp-sclk-rate = <0x21>;
+	};
+};
