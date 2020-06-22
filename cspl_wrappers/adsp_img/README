@@ -1,0 +1,18 @@
+
+Release Note:
+
+ - hwcfg and mt6853-params from the lates official Aurisys(Official)_ALPS W1.2020.01, dowloaded from MTK's exchange.
+ - [MTK RELEASE][Cirrus]ALPS-MP-Q0.MP2-V1.55.PRE.B_K6853V1_64_PRE.md5 ALPS-MP-Q0.MP2-V1.55.PRE.B_K6853V1_64_PRE_INHOUSE
+ - folder content :
+.
+├ adsp_default_build
+│   ├ audio_dsp-default-build-with-xtensa.img - build from clean with xtensa tools
+│   └ audio_dsp-default.img	- buid without xtensa tools (build system just copied default DSK image)
+├ android_full_build
+│   ├ audio_dsp.img		- after full android build found in out/target/product/k6853v1_64_pre/	
+│   └ audio_dsp-verified.img	- after full android build found in out/target/product/k6853v1_64_pre/
+└ README
+
+
+
+  
