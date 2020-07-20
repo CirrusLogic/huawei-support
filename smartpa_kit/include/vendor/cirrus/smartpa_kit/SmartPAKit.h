@@ -49,7 +49,7 @@ public:
     int speakerOn(unsigned int scene);
     int speakerOff(unsigned int scene);
 
-    void setCalibValue(unsigned int re);
+    void setCalibValue(void *param, unsigned int param_len);
     int getDefaultCalibState(void);
     void setDefaultCalibValue(int value);
 
@@ -66,6 +66,7 @@ private:
     bool mIsDSPBypass;
     unsigned int mReValue;
 
+    int sendIoctlCmd(unsigned int cmd);
     int sendIoctlCmd(unsigned int cmd, void *arg);
 };
 
