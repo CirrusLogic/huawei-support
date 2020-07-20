@@ -462,6 +462,7 @@ extern const int cs35l36_a0_pac_patch[CS35L36_PAC_PROG_MEM];
 #define CS35L36_SPK_GET_R0_REALTIME		_IOWR(CS35L36_MAGIC_NUMBER, 14, void *)
 #define CS35L36_SPK_SET_DEFAULT_CALIB	_IOWR(CS35L36_MAGIC_NUMBER, 15, void *)
 #define CS35L36_SPK_GET_CALIB_STATE		_IOWR(CS35L36_MAGIC_NUMBER, 16, void *)
+#define CS35L36_SPK_CALIBRATE			_IOWR(CS35L36_MAGIC_NUMBER, 17, void *)
 
 #ifdef CONFIG_COMPAT
 #define CS35L36_SPK_DAC_VOLUME_COMPAT	\
@@ -496,6 +497,35 @@ extern const int cs35l36_a0_pac_patch[CS35L36_PAC_PROG_MEM];
 								_IOWR(CS35L36_MAGIC_NUMBER, 15, compat_uptr_t)
 #define CS35L36_SPK_GET_CALIB_STATE_COMPAT	\
 								_IOWR(CS35L36_MAGIC_NUMBER, 16, compat_uptr_t)
+#define CS35L36_SPK_CALIBRATE_COMPAT	\
+								_IOWR(CS35L36_MAGIC_NUMBER, 17, compat_uptr_t)
 #endif
 
+// Structs for Aurisys API
+typedef struct calibration_param_t {
+	int32_t ambient_temperature;
+	int32_t Re_DC;
+	int32_t status;
+	int32_t checksum;
+} calibration_param_t;
+
+typedef struct calibration_cmd_t {
+	int32_t command;
+	calibration_param_t data;
+} calibration_cmd_t;
+
+enum cspl_arsi_command {
+	CSPL_CMD_START_CALIBRATION	= 2020,
+	CSPL_CMD_STOP_CALIBRATION	= 2021,
+	CSPL_CMD_START_DIAGNOSTICS	= 2022,
+	CSPL_CMD_STOP_DIAGNOSTICS	= 2023,
+	CSPL_CMD_SET_REDC			= 2024,
+	CSPL_CMD_SET_STATUS			= 2025,
+	CSPL_CMD_SET_CHECKSUM		= 2026,
+	CSPL_CMD_SET_USECASE		= 2027,
+	CSPL_CMD_SET_IDLE			= 2028,
+	CSPL_CMD_GET_REDC			= 2029,
+	CSPL_CMD_GET_STATUS			= 2030,
+	CSPL_CMD_GET_CHECKSUM		= 2031
+};
 #endif /* __CS35L36_H */

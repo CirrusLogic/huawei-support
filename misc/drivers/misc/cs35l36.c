@@ -18,12 +18,15 @@
 #include <linux/miscdevice.h>
 #include <linux/ioctl.h>
 #include <linux/uaccess.h>
+#include <linux/vmalloc.h>
 #ifdef CONFIG_COMPAT
 #include <linux/compat.h>
 #endif
 
 #include <linux/platform_data/cs35l36.h>
 #include "cs35l36.h"
+/* MTK platform header */
+#include <mtk-sp-spk-amp.h>
 
 #include "smartpakit.h"
 #define VENDOR_ID_CIRRUS 3
@@ -39,7 +42,7 @@ static const char * const cs35l36_supplies[] = {
 	"VP",
 };
 
-struct  cs35l36_private {
+struct cs35l36_private {
 	struct device *dev;
 	struct cs35l36_platform_data pdata;
 	struct regmap *regmap;
@@ -52,6 +55,15 @@ struct  cs35l36_private {
 	struct mutex lock;
 	struct miscdevice misc_dev;
 };
+
+struct cs35l36_calib_data {
+	uint32_t status;
+	uint32_t rdc;
+	uint32_t temp;
+	uint32_t checksum;
+};
+
+struct cs35l36_calib_data calib_data;
 
 static struct reg_default cs35l36_reg[] = {
 	{CS35L36_TESTKEY_CTRL,			0x00000000},
@@ -399,6 +411,52 @@ static int cs35l36_spk_power_off(struct cs35l36_private *cs35l36)
 	regmap_update_bits(cs35l36->regmap, CS35L36_PWR_CTRL2, 0x01, 0);
 
 	return 0;
+}
+
+
+static int cs35l36_send_data_to_dsp(int32_t *buffer, int16_t length)
+{
+	int ret = 0;
+
+	if (buffer == NULL)
+		return -EFAULT;
+
+	ret = mtk_spk_send_ipi_buf_to_dsp(buffer, length);
+
+	return ret;
+}
+
+static int cs35l36_receive_data_from_dsp(int8_t *buffer, int16_t size, uint32_t *length)
+{
+	int ret = 0;
+
+	ret = mtk_spk_recv_ipi_buf_from_dsp(buffer, size, length);
+
+	return ret;
+}
+
+static int cs35l36_calibration(void)
+{
+	calibration_param_t calib_param;
+	calibration_cmd_t calib_cmd;
+	uint32_t *dsp_send_buffer;
+
+	calib_cmd.command = CSPL_CMD_START_CALIBRATION;
+	calib_param.ambient_temperature = calib_data.temp;
+	calib_param.Re_DC = calib_data.rdc;
+	calib_param.status = calib_data.status;
+	calib_param.checksum = calib_data.checksum;
+	calib_cmd.data = calib_param;
+
+	dsp_send_buffer = kmalloc(sizeof(calibration_cmd_t), GFP_KERNEL);
+	dsp_send_buffer[0] = calib_cmd.command;
+	dsp_send_buffer[1] = calib_param.ambient_temperature;
+	dsp_send_buffer[2] = calib_param.Re_DC;
+	dsp_send_buffer[3] = calib_param.status;
+	dsp_send_buffer[4] = calib_param.checksum;
+
+	return cs35l36_send_data_to_dsp(dsp_send_buffer,
+								(sizeof(calibration_cmd_t) / sizeof(uint32_t)));
 }
 
 static int cs35l36_boost_inductor(struct cs35l36_private *cs35l36, int inductor)
@@ -1056,8 +1114,21 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 	case CS35L36_SPK_GET_CAL_STRUCT:
 		break;
 	case CS35L36_SPK_SET_CAL_STRUCT:
+		if (copy_from_user(&calib_data, arg, sizeof(struct cs35l36_calib_data))) {
+			dev_err(cs35l36->dev, "copy from user failed\n");
+			ret = -EFAULT;
+			goto exit;
+		}
+		dev_info(cs35l36->dev, "Set calib struct:\n");
+		dev_info(cs35l36->dev, "\tStatus: %d\n", calib_data.status);
+		dev_info(cs35l36->dev, "\tRDC: 0x%x\n", calib_data.rdc);
+		dev_info(cs35l36->dev, "\tAmbient: %d\n", calib_data.temp);
+		dev_info(cs35l36->dev, "\tChecksum: 0x%x\n", calib_data.checksum);
 		break;
 	case CS35L36_SPK_SET_AMBIENT:
+		break;
+	case CS35L36_SPK_CALIBRATE:
+		ret = cs35l36_calibration();
 		break;
 	default:
 		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
@@ -1122,6 +1193,18 @@ static long cs35l36_compat_ioctl(struct file *f, unsigned int cmd,
 		break;
 	case CS35L36_SPK_SWITCH_FIRMWARE_COMPAT:
 		cmd64 = CS35L36_SPK_SWITCH_FIRMWARE;
+		break;
+	case CS35L36_SPK_GET_R0_REALTIME_COMPAT:
+		cmd64 = CS35L36_SPK_GET_R0_REALTIME;
+		break;
+	case CS35L36_SPK_SET_DEFAULT_CALIB_COMPAT:
+		cmd64 = CS35L36_SPK_SET_DEFAULT_CALIB;
+		break;
+	case CS35L36_SPK_GET_CALIB_STATE_COMPAT:
+		cmd64 = CS35L36_SPK_GET_CALIB_STATE;
+		break;
+	case CS35L36_SPK_CALIBRATE_COMPAT:
+		cmd64 = CS35L36_SPK_CALIBRATE;
 		break;
 	default:
 		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
