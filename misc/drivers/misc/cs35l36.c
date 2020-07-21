@@ -25,6 +25,7 @@
 
 #include <linux/platform_data/cs35l36.h>
 #include "cs35l36.h"
+
 /* MTK platform header */
 #include <mtk-sp-spk-amp.h>
 
@@ -411,52 +412,6 @@ static int cs35l36_spk_power_off(struct cs35l36_private *cs35l36)
 	regmap_update_bits(cs35l36->regmap, CS35L36_PWR_CTRL2, 0x01, 0);
 
 	return 0;
-}
-
-
-static int cs35l36_send_data_to_dsp(int32_t *buffer, int16_t length)
-{
-	int ret = 0;
-
-	if (buffer == NULL)
-		return -EFAULT;
-
-	ret = mtk_spk_send_ipi_buf_to_dsp(buffer, length);
-
-	return ret;
-}
-
-static int cs35l36_receive_data_from_dsp(int8_t *buffer, int16_t size, uint32_t *length)
-{
-	int ret = 0;
-
-	ret = mtk_spk_recv_ipi_buf_from_dsp(buffer, size, length);
-
-	return ret;
-}
-
-static int cs35l36_calibration(void)
-{
-	calibration_param_t calib_param;
-	calibration_cmd_t calib_cmd;
-	uint32_t *dsp_send_buffer;
-
-	calib_cmd.command = CSPL_CMD_START_CALIBRATION;
-	calib_param.ambient_temperature = calib_data.temp;
-	calib_param.Re_DC = calib_data.rdc;
-	calib_param.status = calib_data.status;
-	calib_param.checksum = calib_data.checksum;
-	calib_cmd.data = calib_param;
-
-	dsp_send_buffer = kmalloc(sizeof(calibration_cmd_t), GFP_KERNEL);
-	dsp_send_buffer[0] = calib_cmd.command;
-	dsp_send_buffer[1] = calib_param.ambient_temperature;
-	dsp_send_buffer[2] = calib_param.Re_DC;
-	dsp_send_buffer[3] = calib_param.status;
-	dsp_send_buffer[4] = calib_param.checksum;
-
-	return cs35l36_send_data_to_dsp(dsp_send_buffer,
-								(sizeof(calibration_cmd_t) / sizeof(uint32_t)));
 }
 
 static int cs35l36_boost_inductor(struct cs35l36_private *cs35l36, int inductor)
@@ -1074,6 +1029,120 @@ static void cs35l36_apply_vpbr_config(struct cs35l36_private *cs35l36)
 			   CS35L36_VPBR_MUTE_EN_SHIFT);
 }
 
+static int cs35l36_send_data_to_dsp(struct cs35l36_private *cs35l36,
+									calibration_cmd_t calib_cmd)
+{
+	int ret = 0;
+	uint32_t *dsp_send_buffer;
+
+	dsp_send_buffer = kmalloc(sizeof(calibration_cmd_t), GFP_KERNEL);
+	if (!dsp_send_buffer) {
+		dev_err(cs35l36->dev, "Failed to allocate memory for buffer\n");
+		return -ENOMEM;
+	}
+	dsp_send_buffer[0] = calib_cmd.command;
+	dsp_send_buffer[1] = calib_cmd.data.ambient_temperature;
+	dsp_send_buffer[2] = calib_cmd.data.Re_DC;
+	dsp_send_buffer[3] = calib_cmd.data.status;
+	dsp_send_buffer[4] = calib_cmd.data.checksum;
+
+	ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer,
+								(sizeof(calibration_cmd_t) / sizeof(uint32_t)));
+
+	return ret;
+}
+
+static int cs35l36_receive_data_from_dsp(struct cs35l36_private *cs35l36,
+										 calibration_cmd_t *calib_cmd)
+{
+	int ret = 0;
+	uint32_t data_length = 0;
+	uint8_t *dsp_recv_buffer;
+	uint32_t *buffer;
+
+	dsp_recv_buffer = kmalloc(sizeof(struct cs35l36_calib_data), GFP_KERNEL);
+	if (!dsp_recv_buffer) {
+		dev_err(cs35l36->dev, "Failed to allocate memory for buffer\n");
+		return -ENOMEM;
+	}
+	ret = mtk_spk_recv_ipi_buf_from_dsp(dsp_recv_buffer,
+										sizeof(struct calibration_cmd_t),
+										&data_length);
+	if (ret) {
+		dev_err(cs35l36->dev, "Failed to read calib struct from the DSP\n");
+		return -EFAULT;
+	}
+
+	buffer = (uint32_t *) dsp_recv_buffer;
+	calib_cmd->command = buffer[0];
+	if (calib_cmd->command != CSPL_CMD_GET_CALIBRATION_PARAM) {
+		dev_err(cs35l36->dev, "Calib cmd type does not match\n");
+		return -EINVAL;
+	}
+	calib_cmd->data.ambient_temperature = buffer[1];
+	calib_cmd->data.Re_DC = buffer[2];
+	calib_cmd->data.status = buffer[3];
+	calib_cmd->data.checksum = buffer[4];
+
+	return ret;
+}
+
+static int cs35l36_get_calib_struct(struct cs35l36_private *cs35l36)
+{
+	int ret = 0;
+	calibration_cmd_t calib_cmd;
+
+	ret = cs35l36_receive_data_from_dsp(cs35l36, &calib_cmd);
+	if (ret) {
+		dev_err(cs35l36->dev, "Failed to read calib struct from the DSP\n");
+		return ret;
+	}
+
+	calib_data.temp = calib_cmd.data.ambient_temperature;
+	calib_data.rdc = calib_cmd.data.Re_DC;
+	calib_data.status = calib_cmd.data.status;
+	calib_data.checksum = calib_cmd.data.checksum;
+
+	dev_info(cs35l36->dev, "Read cal struct:\n");
+	dev_info(cs35l36->dev, "\tStatus: %d\n", calib_data.status);
+	dev_info(cs35l36->dev, "\tRDC: 0x%x\n", calib_data.rdc);
+	dev_info(cs35l36->dev, "\tAmbient: %d\n", calib_data.temp);
+	dev_info(cs35l36->dev, "\tChecksum: 0x%x\n", calib_data.checksum);
+
+	return ret;
+}
+
+static int cs35l36_set_calib_struct(struct cs35l36_private *cs35l36)
+{
+	int ret = 0;
+	calibration_cmd_t calib_cmd;
+
+	ret = cs35l36_receive_data_from_dsp(cs35l36, &calib_cmd);
+	if (ret) {
+		dev_err(cs35l36->dev, "Failed to read calib struct from the DSP\n");
+		return ret;
+	}
+
+	calib_cmd.command = CSPL_CMD_SET_CALIBRATION_PARAM;
+
+	return cs35l36_send_data_to_dsp(cs35l36, calib_cmd);
+}
+
+static int cs35l36_calibration(struct cs35l36_private *cs35l36)
+{
+	calibration_param_t calib_param;
+	calibration_cmd_t calib_cmd;
+
+	calib_cmd.command = CSPL_CMD_START_CALIBRATION;
+	calib_param.ambient_temperature = calib_data.temp;
+	calib_param.Re_DC = 0;
+	calib_param.status = 0;
+	calib_param.checksum = 0;
+	calib_cmd.data = calib_param;
+
+	return cs35l36_send_data_to_dsp(cs35l36, calib_cmd);
+}
+
 static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 {
 	struct miscdevice *dev = f->private_data;
@@ -1105,30 +1174,54 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		break;
 	case CS35L36_SPK_SWITCH_CONFIGURATION:
 		break;
-	case CS35L36_SPK_SWITCH_FIRMWARE:
-		break;
 	case CS35L36_SPK_GET_R0:
 		break;
 	case CS35L36_SPK_GET_F0:
 		break;
 	case CS35L36_SPK_GET_CAL_STRUCT:
-		break;
-	case CS35L36_SPK_SET_CAL_STRUCT:
-		if (copy_from_user(&calib_data, arg, sizeof(struct cs35l36_calib_data))) {
-			dev_err(cs35l36->dev, "copy from user failed\n");
+		ret = cs35l36_get_calib_struct(cs35l36);
+		if (ret) {
+			dev_err(cs35l36->dev, "Failed to get calib struct from dsp\n");
 			ret = -EFAULT;
 			goto exit;
 		}
-		dev_info(cs35l36->dev, "Set calib struct:\n");
-		dev_info(cs35l36->dev, "\tStatus: %d\n", calib_data.status);
-		dev_info(cs35l36->dev, "\tRDC: 0x%x\n", calib_data.rdc);
-		dev_info(cs35l36->dev, "\tAmbient: %d\n", calib_data.temp);
-		dev_info(cs35l36->dev, "\tChecksum: 0x%x\n", calib_data.checksum);
+		if (copy_to_user((struct cs35l36_calib_data *)arg, &calib_data,
+						  sizeof(struct cs35l36_calib_data))) {
+			dev_err(cs35l36->dev, "copy to user failed\n");
+			ret = -EFAULT;
+			goto exit;
+		}
+		break;
+	case CS35L36_SPK_SET_CAL_STRUCT:
+		ret = cs35l36_set_calib_struct(cs35l36);
 		break;
 	case CS35L36_SPK_SET_AMBIENT:
+		dev_info(cs35l36->dev, "copy from user val = %d\n", val);
+		calib_data.temp = val;
+		break;
+	case CS35L36_SPK_SET_R0:
+		ret = cs35l36_get_calib_struct(cs35l36);
+		if (ret) {
+			dev_err(cs35l36->dev, "Failed to get calib struct from dsp\n");
+			ret = -EFAULT;
+			goto exit;
+		}
+		if (copy_to_user((uint32_t *) arg, &calib_data.rdc, sizeof(uint32_t))) {
+			dev_err(cs35l36->dev, "copy to user failed\n");
+			ret = -EFAULT;
+			goto exit;
+		}
+		break;
+	case CS35L36_SPK_SWITCH_FIRMWARE:
+		break;
+	case CS35L36_SPK_GET_R0_REALTIME:
+		break;
+	case CS35L36_SPK_SET_DEFAULT_CALIB:
+		break;
+	case CS35L36_SPK_GET_CALIB_STATE:
 		break;
 	case CS35L36_SPK_CALIBRATE:
-		ret = cs35l36_calibration();
+		ret = cs35l36_calibration(cs35l36);
 		break;
 	default:
 		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
