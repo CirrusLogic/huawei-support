@@ -39,7 +39,7 @@ public:
     void deinit(void);
 
     // Mandatory
-    int calibrate(void);
+    int calibrate(int temprature);
     int getR0(unsigned int *r0_array);
     int getRe(unsigned int *re_array);
     int getF0(unsigned int *f0_array);
@@ -49,7 +49,9 @@ public:
     int speakerOn(unsigned int scene);
     int speakerOff(unsigned int scene);
 
-    void setCalibValue(void *param, unsigned int param_len);
+    void getCalibValue(void);
+    void setCalibValue(void);
+    void setR0(void);
     int getDefaultCalibState(void);
     void setDefaultCalibValue(int value);
 
@@ -66,7 +68,6 @@ private:
     bool mIsDSPBypass;
     unsigned int mReValue;
 
-    int sendIoctlCmd(unsigned int cmd);
     int sendIoctlCmd(unsigned int cmd, void *arg);
 };
 

@@ -42,6 +42,7 @@
 #define CS35L36_SPK_GET_R0_REALTIME		_IOWR(CS35L36_MAGIC_NUMBER, 14, void *)
 #define CS35L36_SPK_SET_DEFAULT_CALIB	_IOWR(CS35L36_MAGIC_NUMBER, 15, void *)
 #define CS35L36_SPK_GET_CALIB_STATE		_IOWR(CS35L36_MAGIC_NUMBER, 16, void *)
+#define CS35L36_SPK_CALIBRATE			_IOWR(CS35L36_MAGIC_NUMBER, 17, void *)
 
 #ifdef CONFIG_COMPAT
 #define CS35L36_SPK_DAC_VOLUME_COMPAT	\
@@ -76,6 +77,8 @@
 								_IOWR(CS35L36_MAGIC_NUMBER, 15, compat_uptr_t)
 #define CS35L36_SPK_GET_CALIB_STATE_COMPAT	\
 								_IOWR(CS35L36_MAGIC_NUMBER, 16, compat_uptr_t)
+#define CS35L36_SPK_CALIBRATE_COMPAT	\
+								_IOWR(CS35L36_MAGIC_NUMBER, 17, compat_uptr_t)
 #endif
 
 #define CS_DEVICE "/dev/cs35l36"
@@ -121,6 +124,13 @@ enum smartpa_cmd {
 	SET_CALIB_VALUE,
 	DSP_BYPASS,
 	SMARTPA_CMD_MAX,
+};
+
+struct cs35l36_calib_data {
+	uint32_t status;
+	uint32_t rdc;
+	uint32_t temp;
+	uint32_t checksum;
 };
 
 #endif /* __CS35L36_H */

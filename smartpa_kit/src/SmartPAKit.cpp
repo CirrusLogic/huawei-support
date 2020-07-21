@@ -66,10 +66,16 @@ void CirrusSmartPAKit::deinit(void)
     mIsDSPBypass = false;
 }
 
-int CirrusSmartPAKit::calibrate(void)
+int CirrusSmartPAKit::calibrate(int temprature)
 {
     ALOGD("%s", __func__);
     int ret = 0;
+
+    ret = sendIoctlCmd(CS35L36_SPK_SET_AMBIENT, &temprature);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_SET_AMBIENT failed (%d)", __func__, ret);
+        return ret;
+    }
 
     ret = sendIoctlCmd(CS35L36_SPK_CALIBRATE, &ret);
     if (ret < 0) {
@@ -161,24 +167,51 @@ int CirrusSmartPAKit::speakerOff(unsigned int scene)
     return ret;
 }
 
-void CirrusSmartPAKit::setCalibValue(void *param, unsigned int param_len)
+void CirrusSmartPAKit::getCalibValue(void)
 {
     ALOGD("%s", __func__);
     int ret = 0 ;
     struct cs35l36_calib_data calib_data;
 
-    int *calib_param = (int *) param;
-    calib_data.status = calib_param[0];
-    calib_data.rdc = calib_param[1];
-    calib_data.temp = calib_param[2];
-    calib_data.checksum = calib_param[3];
-    ret = sendIoctlCmd(CS35L36_SPK_SET_CAL_STRUCT, &calib_data);
+    ret = sendIoctlCmd(CS35L36_SPK_GET_CAL_STRUCT, &calib_data);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_GET_CAL_STRUCT failed (%d)", __func__, ret);
+        return;
+    }
+
+    ALOGD("%s: Get calibration value:", __func__);
+	ALOGD("\tStatus: %d\n", calib_data.status);
+	ALOGD("\tRDC: 0x%x\n", calib_data.rdc);
+	ALOGD("\tAmbient: %d\n", calib_data.temp);
+	ALOGD("\tChecksum: 0x%x\n", calib_data.checksum);
+}
+
+void CirrusSmartPAKit::setCalibValue(void)
+{
+    ALOGD("%s", __func__);
+    int ret = 0 ;
+
+    ret = sendIoctlCmd(CS35L36_SPK_SET_CAL_STRUCT, &ret);
     if (ret < 0) {
         ALOGE("%s: CS35L36_SPK_SET_CAL_STRUCT failed (%d)", __func__, ret);
         return;
     }
 
     ALOGD("%s: Set calibration value", __func__);
+}
+
+void CirrusSmartPAKit::setR0(void)
+{
+    ALOGD("%s", __func__);
+    int ret = 0 ;
+
+    ret = sendIoctlCmd(CS35L36_SPK_SET_R0, &mReValue);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_SET_R0 failed (%d)", __func__, ret);
+        return;
+    }
+
+    ALOGD("%s: Set R0 value %d", __func__, mReValue);
 }
 
 int CirrusSmartPAKit::getDefaultCalibState(void)
