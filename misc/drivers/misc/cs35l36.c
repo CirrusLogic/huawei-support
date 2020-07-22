@@ -1048,6 +1048,7 @@ static int cs35l36_send_data_to_dsp(struct cs35l36_private *cs35l36,
 
 	ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer, (sizeof(calibration_cmd_t)));
 
+
 	return ret;
 }
 
@@ -1127,7 +1128,7 @@ static int cs35l36_set_calib_struct(struct cs35l36_private *cs35l36)
 	return cs35l36_send_data_to_dsp(cs35l36, calib_cmd);
 }
 
-static int cs35l36_calibration(struct cs35l36_private *cs35l36)
+static int cs35l36_calibration_start(struct cs35l36_private *cs35l36)
 {
 	calibration_param_t calib_param;
 	calibration_cmd_t calib_cmd;
@@ -1138,6 +1139,15 @@ static int cs35l36_calibration(struct cs35l36_private *cs35l36)
 	calib_param.status = 0;
 	calib_param.checksum = 0;
 	calib_cmd.data = calib_param;
+
+	return cs35l36_send_data_to_dsp(cs35l36, calib_cmd);
+}
+
+static int cs35l36_calibration_stop(struct cs35l36_private *cs35l36)
+{
+	calibration_cmd_t calib_cmd;
+
+	calib_cmd.command = CSPL_CMD_STOP_CALIBRATION;
 
 	return cs35l36_send_data_to_dsp(cs35l36, calib_cmd);
 }
@@ -1219,8 +1229,11 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		break;
 	case CS35L36_SPK_GET_CALIB_STATE:
 		break;
-	case CS35L36_SPK_CALIBRATE:
-		ret = cs35l36_calibration(cs35l36);
+	case CS35L36_SPK_START_CALIBRATION:
+		ret = cs35l36_calibration_start(cs35l36);
+		break;
+	case CS35L36_SPK_STOP_CALIBRATION:
+		ret = cs35l36_calibration_stop(cs35l36);
 		break;
 	default:
 		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
@@ -1295,8 +1308,11 @@ static long cs35l36_compat_ioctl(struct file *f, unsigned int cmd,
 	case CS35L36_SPK_GET_CALIB_STATE_COMPAT:
 		cmd64 = CS35L36_SPK_GET_CALIB_STATE;
 		break;
-	case CS35L36_SPK_CALIBRATE_COMPAT:
-		cmd64 = CS35L36_SPK_CALIBRATE;
+	case CS35L36_SPK_START_CALIBRATION_COMPAT:
+		cmd64 = CS35L36_SPK_START_CALIBRATION;
+		break;
+	case CS35L36_SPK_STOP_CALIBRATION_COMPAT:
+		cmd64 = CS35L36_SPK_STOP_CALIBRATION;
 		break;
 	default:
 		dev_err(cs35l36->dev, "Invalid IOCTL, command = %d\n", cmd);
@@ -1450,6 +1466,7 @@ static int cs35l36_i2c_probe(struct i2c_client *i2c_client,
 		gpiod_set_value_cansleep(cs35l36->reset_gpio, 0);
 		usleep_range(1000, 1100);
 	}
+
 
 	usleep_range(2000, 2100);
 
