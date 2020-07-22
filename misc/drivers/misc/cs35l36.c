@@ -1046,8 +1046,7 @@ static int cs35l36_send_data_to_dsp(struct cs35l36_private *cs35l36,
 	dsp_send_buffer[3] = calib_cmd.data.status;
 	dsp_send_buffer[4] = calib_cmd.data.checksum;
 
-	ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer,
-								(sizeof(calibration_cmd_t) / sizeof(uint32_t)));
+	ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer, (sizeof(calibration_cmd_t)));
 
 	return ret;
 }
