@@ -77,9 +77,9 @@ int CirrusSmartPAKit::calibrate(int temprature)
         return ret;
     }
 
-    ret = sendIoctlCmd(CS35L36_SPK_CALIBRATE, &ret);
+    ret = sendIoctlCmd(CS35L36_SPK_START_CALIBRATION, &ret);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_CALIBRATE failed (%d)", __func__, ret);
+        ALOGE("%s: CS35L36_SPK_START_CALIBRATION failed (%d)", __func__, ret);
         return ret;
     }
 
@@ -261,6 +261,15 @@ void CirrusSmartPAKit::startCalib(void)
 void CirrusSmartPAKit::stopCalib(void)
 {
     ALOGD("%s", __func__);
+    int ret = 0;
+
+    ret = sendIoctlCmd(CS35L36_SPK_STOP_CALIBRATION, &ret);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_STOP_CALIBRATION failed (%d)", __func__, ret);
+        return;
+    }
+
+    ALOGD("%s: Stop calibration success: %d", __func__, ret);
 }
 
 void CirrusSmartPAKit::bypassDSP(bool bypass)
