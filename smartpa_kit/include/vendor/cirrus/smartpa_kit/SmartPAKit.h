@@ -51,7 +51,7 @@ public:
 
     void getCalibValue(void);
     void setCalibValue(void);
-    void setR0(void);
+    void setR0(unsigned int r0);
     int getDefaultCalibState(void);
     void setDefaultCalibValue(int value);
 

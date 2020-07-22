@@ -89,8 +89,18 @@ int CirrusSmartPAKit::calibrate(int temprature)
 int CirrusSmartPAKit::getR0(unsigned int *r0_array)
 {
     ALOGD("%s", __func__);
+    int ret = 0 ;
 
-    return 0;
+    ret = sendIoctlCmd(CS35L36_SPK_GET_R0, &mReValue);
+    if (ret < 0) {
+        ALOGE("%s: CS35L36_SPK_GET_R0 failed (%d)", __func__, ret);
+        return ret;
+    }
+
+    r0_array[0] = mReValue;
+    ALOGD("%s: Get R0 value %d (%d)", __func__, r0_array[0], mReValue);
+
+    return ret;
 }
 
 int CirrusSmartPAKit::getRe(unsigned int *re_array)
@@ -200,18 +210,18 @@ void CirrusSmartPAKit::setCalibValue(void)
     ALOGD("%s: Set calibration value", __func__);
 }
 
-void CirrusSmartPAKit::setR0(void)
+void CirrusSmartPAKit::setR0(unsigned int r0)
 {
     ALOGD("%s", __func__);
     int ret = 0 ;
 
-    ret = sendIoctlCmd(CS35L36_SPK_SET_R0, &mReValue);
+    ret = sendIoctlCmd(CS35L36_SPK_SET_R0, &r0);
     if (ret < 0) {
         ALOGE("%s: CS35L36_SPK_SET_R0 failed (%d)", __func__, ret);
         return;
     }
 
-    ALOGD("%s: Set R0 value %d", __func__, mReValue);
+    ALOGD("%s: Set R0 value %d", __func__, r0);
 }
 
 int CirrusSmartPAKit::getDefaultCalibState(void)
