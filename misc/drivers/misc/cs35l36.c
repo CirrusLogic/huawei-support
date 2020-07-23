@@ -62,6 +62,7 @@ struct cs35l36_private {
 	atomic_t calib_monitor;
 	struct cs35l36_calib_cmd calib_param;
 	uint32_t *dsp_recv_buffer;
+	uint32_t ambient_temperature;
 };
 
 static struct reg_default cs35l36_reg[] = {
@@ -1141,6 +1142,8 @@ static void cs35l36_calibration_start(struct work_struct *wk)
 			usleep_range(200000, 200100);
 		}
 
+		cs35l36->calib_param.command = CSPL_CMD_START_CALIBRATION;
+		cs35l36->calib_param.data.temperature =cs35l36->ambient_temperature;
 		ret = cs35l36_send_data_to_dsp(cs35l36);
 		dev_info(cs35l36->dev, "calibration_start cmd had sent, ret  = %d\n", ret);
 
@@ -1224,7 +1227,7 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		break;
 	case CS35L36_SPK_SET_AMBIENT:
 		dev_info(cs35l36->dev, "copy from user val = %d\n", val);
-		cs35l36->calib_param.data.temperature = val;
+		cs35l36->ambient_temperature = val;
 		break;
 	case CS35L36_SPK_SET_R0:
 		break;
