@@ -505,24 +505,25 @@ extern const int cs35l36_a0_pac_patch[CS35L36_PAC_PROG_MEM];
 #endif
 
 // Structs for Aurisys API
-typedef struct calibration_param_t {
-	int32_t ambient_temperature;
-	int32_t Re_DC;
+struct cs35l36_calib_data {
+	int32_t temperature;
+	int32_t rdc;
 	int32_t status;
 	int32_t checksum;
-} calibration_param_t;
+};
 
-typedef struct calibration_cmd_t {
+struct cs35l36_calib_cmd {
 	int32_t command;
-	calibration_param_t data;
-} calibration_cmd_t;
+	struct cs35l36_calib_data data;
+};
 
-enum cspl_arsi_command {
+enum cs35l36_cspl_arsi_command {
 	CSPL_CMD_START_CALIBRATION		= 2020,
 	CSPL_CMD_STOP_CALIBRATION		= 2021,
 	CSPL_CMD_START_DIAGNOSTICS		= 2022,
 	CSPL_CMD_STOP_DIAGNOSTICS		= 2023,
 	CSPL_CMD_SET_CALIBRATION_PARAM	= 2024,
-	CSPL_CMD_GET_CALIBRATION_PARAM	= 2025
+	CSPL_CMD_GET_CALIBRATION_PARAM	= 2025,
+	CSPL_CMD_LIBARAY_READY			= 2026
 };
 #endif /* __CS35L36_H */

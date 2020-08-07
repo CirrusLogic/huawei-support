@@ -130,10 +130,10 @@ enum smartpa_cmd {
 };
 
 struct cs35l36_calib_data {
-	uint32_t status;
-	uint32_t rdc;
-	uint32_t temp;
-	uint32_t checksum;
+	int32_t temperature;
+	int32_t rdc;
+	int32_t status;
+	int32_t checksum;
 };
 
 #endif /* __CS35L36_H */
