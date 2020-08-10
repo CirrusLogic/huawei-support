@@ -1106,24 +1106,6 @@ static int cs35l36_get_calib_struct(struct cs35l36_private *cs35l36)
 	return ret;
 }
 
-static int cs35l36_set_calib_struct(struct cs35l36_private *cs35l36)
-{
-	int ret = 0;
-	ret = cs35l36_receive_data_from_dsp(cs35l36);
-	if (ret) {
-		dev_err(cs35l36->dev, "Failed to read calib struct from the DSP\n");
-		return ret;
-	}
-	if (cs35l36->calib_param.command != CSPL_CMD_GET_CALIBRATION_PARAM) {
-		dev_err(cs35l36->dev, "Calib cmd type does not match\n");
-		return -EINVAL;
-	}
-
-	cs35l36->calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
-
-	return cs35l36_send_data_to_dsp(cs35l36);
-}
-
 static void cs35l36_calibration_start(struct work_struct *wk)
 {
 	struct cs35l36_private *cs35l36;
@@ -1162,6 +1144,7 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 {
 	struct miscdevice *dev = f->private_data;
 	struct cs35l36_private *cs35l36;
+	struct cs35l36_calib_data *calib_param;
 	int ret = 0, val;
 
 	cs35l36 = container_of(dev, struct cs35l36_private, misc_dev);
@@ -1223,7 +1206,20 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		}
 		break;
 	case CS35L36_SPK_SET_CAL_STRUCT:
-		ret = cs35l36_set_calib_struct(cs35l36);
+		calib_param = kmalloc(sizeof(struct cs35l36_calib_data), GFP_KERNEL);
+		if (copy_from_user(calib_param, arg, sizeof(struct cs35l36_calib_data))) {
+			dev_err(cs35l36->dev, "copy from user failed\n");
+			ret = -EFAULT;
+			goto exit;
+		}
+		cs35l36->calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
+		cs35l36->calib_param.data.temperature = calib_param->temperature;
+		cs35l36->calib_param.data.rdc = calib_param->rdc;
+		cs35l36->calib_param.data.status = calib_param->status;
+		cs35l36->calib_param.data.checksum = calib_param->checksum;
+
+		ret = cs35l36_send_data_to_dsp(cs35l36);
+		kfree(calib_param);
 		break;
 	case CS35L36_SPK_SET_AMBIENT:
 		dev_info(cs35l36->dev, "copy from user val = %d\n", val);
