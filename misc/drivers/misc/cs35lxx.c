@@ -33,7 +33,6 @@
 #include "smartpakit.h"
 #define VENDOR_ID_CIRRUS 3
 
-
 /*
  * Some fields take zero as a valid value so use a high bit flag that won't
  * get written to the device to mark those.
@@ -182,200 +181,200 @@ static struct reg_default cs35lxx_reg[] = {
 static bool cs35lxx_readable_reg(struct device *dev, unsigned int reg)
 {
 	switch (reg) {
-	case CS35LXX_SW_RESET:
-	case CS35LXX_SW_REV:
-	case CS35LXX_HW_REV:
-	case CS35LXX_TESTKEY_CTRL:
-	case CS35LXX_USERKEY_CTL:
-	case CS35LXX_OTP_MEM30:
-	case CS35LXX_OTP_CTRL1:
-	case CS35LXX_OTP_CTRL2:
-	case CS35LXX_OTP_CTRL3:
-	case CS35LXX_OTP_CTRL4:
-	case CS35LXX_OTP_CTRL5:
-	case CS35LXX_PAC_CTL1:
-	case CS35LXX_PAC_CTL2:
-	case CS35LXX_PAC_CTL3:
-	case CS35LXX_DEVICE_ID:
-	case CS35LXX_FAB_ID:
-	case CS35LXX_REV_ID:
-	case CS35LXX_PWR_CTRL1:
-	case CS35LXX_PWR_CTRL2:
-	case CS35LXX_PWR_CTRL3:
-	case CS35LXX_CTRL_OVRRIDE:
-	case CS35LXX_AMP_OUT_MUTE:
-	case CS35LXX_OTP_TRIM_STATUS:
-	case CS35LXX_DISCH_FILT:
-	case CS35LXX_PROTECT_REL_ERR:
-	case CS35LXX_PAD_INTERFACE:
-	case CS35LXX_PLL_CLK_CTRL:
-	case CS35LXX_GLOBAL_CLK_CTRL:
-	case CS35LXX_ADC_CLK_CTRL:
-	case CS35LXX_SWIRE_CLK_CTRL:
-	case CS35LXX_SP_SCLK_CLK_CTRL:
-	case CS35LXX_TST_FS_MON0:
-	case CS35LXX_MDSYNC_EN:
-	case CS35LXX_MDSYNC_TX_ID:
-	case CS35LXX_MDSYNC_PWR_CTRL:
-	case CS35LXX_MDSYNC_DATA_TX:
-	case CS35LXX_MDSYNC_TX_STATUS:
-	case CS35LXX_MDSYNC_RX_STATUS:
-	case CS35LXX_MDSYNC_ERR_STATUS:
-	case CS35LXX_BSTCVRT_VCTRL1:
-	case CS35LXX_BSTCVRT_VCTRL2:
-	case CS35LXX_BSTCVRT_PEAK_CUR:
-	case CS35LXX_BSTCVRT_SFT_RAMP:
-	case CS35LXX_BSTCVRT_COEFF:
-	case CS35LXX_BSTCVRT_SLOPE_LBST:
-	case CS35LXX_BSTCVRT_SW_FREQ:
-	case CS35LXX_BSTCVRT_DCM_CTRL:
-	case CS35LXX_BSTCVRT_DCM_MODE_FORCE:
-	case CS35LXX_BSTCVRT_OVERVOLT_CTRL:
-	case CS35LXX_BST_TST_MANUAL:
-	case CS35LXX_BST_ANA2_TEST:
-	case CS35LXX_VPI_LIMIT_MODE:
-	case CS35LXX_VPI_LIMIT_MINMAX:
-	case CS35LXX_VPI_VP_THLD:
-	case CS35LXX_VPI_TRACK_CTRL:
-	case CS35LXX_VPI_TRIG_MODE_CTRL:
-	case CS35LXX_VPI_TRIG_STEPS:
-	case CS35LXX_VI_SPKMON_FILT:
-	case CS35LXX_VI_SPKMON_GAIN:
-	case CS35LXX_VI_SPKMON_IP_SEL:
-	case CS35LXX_DTEMP_WARN_THLD:
-	case CS35LXX_DTEMP_STATUS:
-	case CS35LXX_VPVBST_FS_SEL:
-	case CS35LXX_VPVBST_VP_CTRL:
-	case CS35LXX_VPVBST_VBST_CTRL:
-	case CS35LXX_ASP_TX_PIN_CTRL:
-	case CS35LXX_ASP_RATE_CTRL:
-	case CS35LXX_ASP_FORMAT:
-	case CS35LXX_ASP_FRAME_CTRL:
-	case CS35LXX_ASP_TX1_TX2_SLOT:
-	case CS35LXX_ASP_TX3_TX4_SLOT:
-	case CS35LXX_ASP_TX5_TX6_SLOT:
-	case CS35LXX_ASP_TX7_TX8_SLOT:
-	case CS35LXX_ASP_RX1_SLOT:
-	case CS35LXX_ASP_RX_TX_EN:
-	case CS35LXX_ASP_RX1_SEL:
-	case CS35LXX_ASP_TX1_SEL:
-	case CS35LXX_ASP_TX2_SEL:
-	case CS35LXX_ASP_TX3_SEL:
-	case CS35LXX_ASP_TX4_SEL:
-	case CS35LXX_ASP_TX5_SEL:
-	case CS35LXX_ASP_TX6_SEL:
-	case CS35LXX_SWIRE_P1_TX1_SEL:
-	case CS35LXX_SWIRE_P1_TX2_SEL:
-	case CS35LXX_SWIRE_P2_TX1_SEL:
-	case CS35LXX_SWIRE_P2_TX2_SEL:
-	case CS35LXX_SWIRE_P2_TX3_SEL:
-	case CS35LXX_SWIRE_DP1_FIFO_CFG:
-	case CS35LXX_SWIRE_DP2_FIFO_CFG:
-	case CS35LXX_SWIRE_DP3_FIFO_CFG:
-	case CS35LXX_SWIRE_PCM_RX_DATA:
-	case CS35LXX_SWIRE_FS_SEL:
-	case CS35LXX_AMP_DIG_VOL_CTRL:
-	case CS35LXX_VPBR_CFG:
-	case CS35LXX_VBBR_CFG:
-	case CS35LXX_VPBR_STATUS:
-	case CS35LXX_VBBR_STATUS:
-	case CS35LXX_OVERTEMP_CFG:
-	case CS35LXX_AMP_ERR_VOL:
-	case CS35LXX_CLASSH_CFG:
-	case CS35LXX_CLASSH_FET_DRV_CFG:
-	case CS35LXX_NG_CFG:
-	case CS35LXX_AMP_GAIN_CTRL:
-	case CS35LXX_PWM_MOD_IO_CTRL:
-	case CS35LXX_PWM_MOD_STATUS:
-	case CS35LXX_DAC_MSM_CFG:
-	case CS35LXX_AMP_SLOPE_CTRL:
-	case CS35LXX_AMP_PDM_VOLUME:
-	case CS35LXX_AMP_PDM_RATE_CTRL:
-	case CS35LXX_PDM_CH_SEL:
-	case CS35LXX_AMP_NG_CTRL:
-	case CS35LXX_PDM_HIGHFILT_CTRL:
-	case CS35LXX_INT1_STATUS:
-	case CS35LXX_INT2_STATUS:
-	case CS35LXX_INT3_STATUS:
-	case CS35LXX_INT4_STATUS:
-	case CS35LXX_INT1_RAW_STATUS:
-	case CS35LXX_INT2_RAW_STATUS:
-	case CS35LXX_INT3_RAW_STATUS:
-	case CS35LXX_INT4_RAW_STATUS:
-	case CS35LXX_INT1_MASK:
-	case CS35LXX_INT2_MASK:
-	case CS35LXX_INT3_MASK:
-	case CS35LXX_INT4_MASK:
-	case CS35LXX_INT1_EDGE_LVL_CTRL:
-	case CS35LXX_INT3_EDGE_LVL_CTRL:
-	case CS35LXX_PAC_INT_STATUS:
-	case CS35LXX_PAC_INT_RAW_STATUS:
-	case CS35LXX_PAC_INT_FLUSH_CTRL:
-	case CS35LXX_PAC_INT0_CTRL:
-	case CS35LXX_PAC_INT1_CTRL:
-	case CS35LXX_PAC_INT2_CTRL:
-	case CS35LXX_PAC_INT3_CTRL:
-	case CS35LXX_PAC_INT4_CTRL:
-	case CS35LXX_PAC_INT5_CTRL:
-	case CS35LXX_PAC_INT6_CTRL:
-	case CS35LXX_PAC_INT7_CTRL:
-		return true;
-	default:
-		if (reg >= CS35LXX_PAC_PMEM_WORD0 &&
-			reg <= CS35LXX_PAC_PMEM_WORD1023)
+		case CS35LXX_SW_RESET:
+		case CS35LXX_SW_REV:
+		case CS35LXX_HW_REV:
+		case CS35LXX_TESTKEY_CTRL:
+		case CS35LXX_USERKEY_CTL:
+		case CS35LXX_OTP_MEM30:
+		case CS35LXX_OTP_CTRL1:
+		case CS35LXX_OTP_CTRL2:
+		case CS35LXX_OTP_CTRL3:
+		case CS35LXX_OTP_CTRL4:
+		case CS35LXX_OTP_CTRL5:
+		case CS35LXX_PAC_CTL1:
+		case CS35LXX_PAC_CTL2:
+		case CS35LXX_PAC_CTL3:
+		case CS35LXX_DEVICE_ID:
+		case CS35LXX_FAB_ID:
+		case CS35LXX_REV_ID:
+		case CS35LXX_PWR_CTRL1:
+		case CS35LXX_PWR_CTRL2:
+		case CS35LXX_PWR_CTRL3:
+		case CS35LXX_CTRL_OVRRIDE:
+		case CS35LXX_AMP_OUT_MUTE:
+		case CS35LXX_OTP_TRIM_STATUS:
+		case CS35LXX_DISCH_FILT:
+		case CS35LXX_PROTECT_REL_ERR:
+		case CS35LXX_PAD_INTERFACE:
+		case CS35LXX_PLL_CLK_CTRL:
+		case CS35LXX_GLOBAL_CLK_CTRL:
+		case CS35LXX_ADC_CLK_CTRL:
+		case CS35LXX_SWIRE_CLK_CTRL:
+		case CS35LXX_SP_SCLK_CLK_CTRL:
+		case CS35LXX_TST_FS_MON0:
+		case CS35LXX_MDSYNC_EN:
+		case CS35LXX_MDSYNC_TX_ID:
+		case CS35LXX_MDSYNC_PWR_CTRL:
+		case CS35LXX_MDSYNC_DATA_TX:
+		case CS35LXX_MDSYNC_TX_STATUS:
+		case CS35LXX_MDSYNC_RX_STATUS:
+		case CS35LXX_MDSYNC_ERR_STATUS:
+		case CS35LXX_BSTCVRT_VCTRL1:
+		case CS35LXX_BSTCVRT_VCTRL2:
+		case CS35LXX_BSTCVRT_PEAK_CUR:
+		case CS35LXX_BSTCVRT_SFT_RAMP:
+		case CS35LXX_BSTCVRT_COEFF:
+		case CS35LXX_BSTCVRT_SLOPE_LBST:
+		case CS35LXX_BSTCVRT_SW_FREQ:
+		case CS35LXX_BSTCVRT_DCM_CTRL:
+		case CS35LXX_BSTCVRT_DCM_MODE_FORCE:
+		case CS35LXX_BSTCVRT_OVERVOLT_CTRL:
+		case CS35LXX_BST_TST_MANUAL:
+		case CS35LXX_BST_ANA2_TEST:
+		case CS35LXX_VPI_LIMIT_MODE:
+		case CS35LXX_VPI_LIMIT_MINMAX:
+		case CS35LXX_VPI_VP_THLD:
+		case CS35LXX_VPI_TRACK_CTRL:
+		case CS35LXX_VPI_TRIG_MODE_CTRL:
+		case CS35LXX_VPI_TRIG_STEPS:
+		case CS35LXX_VI_SPKMON_FILT:
+		case CS35LXX_VI_SPKMON_GAIN:
+		case CS35LXX_VI_SPKMON_IP_SEL:
+		case CS35LXX_DTEMP_WARN_THLD:
+		case CS35LXX_DTEMP_STATUS:
+		case CS35LXX_VPVBST_FS_SEL:
+		case CS35LXX_VPVBST_VP_CTRL:
+		case CS35LXX_VPVBST_VBST_CTRL:
+		case CS35LXX_ASP_TX_PIN_CTRL:
+		case CS35LXX_ASP_RATE_CTRL:
+		case CS35LXX_ASP_FORMAT:
+		case CS35LXX_ASP_FRAME_CTRL:
+		case CS35LXX_ASP_TX1_TX2_SLOT:
+		case CS35LXX_ASP_TX3_TX4_SLOT:
+		case CS35LXX_ASP_TX5_TX6_SLOT:
+		case CS35LXX_ASP_TX7_TX8_SLOT:
+		case CS35LXX_ASP_RX1_SLOT:
+		case CS35LXX_ASP_RX_TX_EN:
+		case CS35LXX_ASP_RX1_SEL:
+		case CS35LXX_ASP_TX1_SEL:
+		case CS35LXX_ASP_TX2_SEL:
+		case CS35LXX_ASP_TX3_SEL:
+		case CS35LXX_ASP_TX4_SEL:
+		case CS35LXX_ASP_TX5_SEL:
+		case CS35LXX_ASP_TX6_SEL:
+		case CS35LXX_SWIRE_P1_TX1_SEL:
+		case CS35LXX_SWIRE_P1_TX2_SEL:
+		case CS35LXX_SWIRE_P2_TX1_SEL:
+		case CS35LXX_SWIRE_P2_TX2_SEL:
+		case CS35LXX_SWIRE_P2_TX3_SEL:
+		case CS35LXX_SWIRE_DP1_FIFO_CFG:
+		case CS35LXX_SWIRE_DP2_FIFO_CFG:
+		case CS35LXX_SWIRE_DP3_FIFO_CFG:
+		case CS35LXX_SWIRE_PCM_RX_DATA:
+		case CS35LXX_SWIRE_FS_SEL:
+		case CS35LXX_AMP_DIG_VOL_CTRL:
+		case CS35LXX_VPBR_CFG:
+		case CS35LXX_VBBR_CFG:
+		case CS35LXX_VPBR_STATUS:
+		case CS35LXX_VBBR_STATUS:
+		case CS35LXX_OVERTEMP_CFG:
+		case CS35LXX_AMP_ERR_VOL:
+		case CS35LXX_CLASSH_CFG:
+		case CS35LXX_CLASSH_FET_DRV_CFG:
+		case CS35LXX_NG_CFG:
+		case CS35LXX_AMP_GAIN_CTRL:
+		case CS35LXX_PWM_MOD_IO_CTRL:
+		case CS35LXX_PWM_MOD_STATUS:
+		case CS35LXX_DAC_MSM_CFG:
+		case CS35LXX_AMP_SLOPE_CTRL:
+		case CS35LXX_AMP_PDM_VOLUME:
+		case CS35LXX_AMP_PDM_RATE_CTRL:
+		case CS35LXX_PDM_CH_SEL:
+		case CS35LXX_AMP_NG_CTRL:
+		case CS35LXX_PDM_HIGHFILT_CTRL:
+		case CS35LXX_INT1_STATUS:
+		case CS35LXX_INT2_STATUS:
+		case CS35LXX_INT3_STATUS:
+		case CS35LXX_INT4_STATUS:
+		case CS35LXX_INT1_RAW_STATUS:
+		case CS35LXX_INT2_RAW_STATUS:
+		case CS35LXX_INT3_RAW_STATUS:
+		case CS35LXX_INT4_RAW_STATUS:
+		case CS35LXX_INT1_MASK:
+		case CS35LXX_INT2_MASK:
+		case CS35LXX_INT3_MASK:
+		case CS35LXX_INT4_MASK:
+		case CS35LXX_INT1_EDGE_LVL_CTRL:
+		case CS35LXX_INT3_EDGE_LVL_CTRL:
+		case CS35LXX_PAC_INT_STATUS:
+		case CS35LXX_PAC_INT_RAW_STATUS:
+		case CS35LXX_PAC_INT_FLUSH_CTRL:
+		case CS35LXX_PAC_INT0_CTRL:
+		case CS35LXX_PAC_INT1_CTRL:
+		case CS35LXX_PAC_INT2_CTRL:
+		case CS35LXX_PAC_INT3_CTRL:
+		case CS35LXX_PAC_INT4_CTRL:
+		case CS35LXX_PAC_INT5_CTRL:
+		case CS35LXX_PAC_INT6_CTRL:
+		case CS35LXX_PAC_INT7_CTRL:
 			return true;
-		else
-			return false;
+		default:
+			if (reg >= CS35LXX_PAC_PMEM_WORD0 &&
+				reg <= CS35LXX_PAC_PMEM_WORD1023)
+				return true;
+			else
+				return false;
 	}
 }
 
 static bool cs35lxx_precious_reg(struct device *dev, unsigned int reg)
 {
 	switch (reg) {
-	case CS35LXX_TESTKEY_CTRL:
-	case CS35LXX_USERKEY_CTL:
-	case CS35LXX_TST_FS_MON0:
-		return true;
-	default:
-		return false;
+		case CS35LXX_TESTKEY_CTRL:
+		case CS35LXX_USERKEY_CTL:
+		case CS35LXX_TST_FS_MON0:
+			return true;
+		default:
+			return false;
 	}
 }
 
 static bool cs35lxx_volatile_reg(struct device *dev, unsigned int reg)
 {
 	switch (reg) {
-	case CS35LXX_SW_RESET:
-	case CS35LXX_SW_REV:
-	case CS35LXX_HW_REV:
-	case CS35LXX_TESTKEY_CTRL:
-	case CS35LXX_USERKEY_CTL:
-	case CS35LXX_DEVICE_ID:
-	case CS35LXX_FAB_ID:
-	case CS35LXX_REV_ID:
-	case CS35LXX_INT1_STATUS:
-	case CS35LXX_INT2_STATUS:
-	case CS35LXX_INT3_STATUS:
-	case CS35LXX_INT4_STATUS:
-	case CS35LXX_INT1_RAW_STATUS:
-	case CS35LXX_INT2_RAW_STATUS:
-	case CS35LXX_INT3_RAW_STATUS:
-	case CS35LXX_INT4_RAW_STATUS:
-	case CS35LXX_INT1_MASK:
-	case CS35LXX_INT2_MASK:
-	case CS35LXX_INT3_MASK:
-	case CS35LXX_INT4_MASK:
-	case CS35LXX_INT1_EDGE_LVL_CTRL:
-	case CS35LXX_INT3_EDGE_LVL_CTRL:
-	case CS35LXX_PAC_INT_STATUS:
-	case CS35LXX_PAC_INT_RAW_STATUS:
-	case CS35LXX_PAC_INT_FLUSH_CTRL:
-		return true;
-	default:
-		if (reg >= CS35LXX_PAC_PMEM_WORD0 &&
-			reg <= CS35LXX_PAC_PMEM_WORD1023)
+		case CS35LXX_SW_RESET:
+		case CS35LXX_SW_REV:
+		case CS35LXX_HW_REV:
+		case CS35LXX_TESTKEY_CTRL:
+		case CS35LXX_USERKEY_CTL:
+		case CS35LXX_DEVICE_ID:
+		case CS35LXX_FAB_ID:
+		case CS35LXX_REV_ID:
+		case CS35LXX_INT1_STATUS:
+		case CS35LXX_INT2_STATUS:
+		case CS35LXX_INT3_STATUS:
+		case CS35LXX_INT4_STATUS:
+		case CS35LXX_INT1_RAW_STATUS:
+		case CS35LXX_INT2_RAW_STATUS:
+		case CS35LXX_INT3_RAW_STATUS:
+		case CS35LXX_INT4_RAW_STATUS:
+		case CS35LXX_INT1_MASK:
+		case CS35LXX_INT2_MASK:
+		case CS35LXX_INT3_MASK:
+		case CS35LXX_INT4_MASK:
+		case CS35LXX_INT1_EDGE_LVL_CTRL:
+		case CS35LXX_INT3_EDGE_LVL_CTRL:
+		case CS35LXX_PAC_INT_STATUS:
+		case CS35LXX_PAC_INT_RAW_STATUS:
+		case CS35LXX_PAC_INT_FLUSH_CTRL:
 			return true;
-		else
-			return false;
+		default:
+			if (reg >= CS35LXX_PAC_PMEM_WORD0 &&
+				reg <= CS35LXX_PAC_PMEM_WORD1023)
+				return true;
+			else
+				return false;
 	}
 }
 
@@ -390,11 +389,11 @@ static const struct reg_sequence cs35lxx_spk_power_on_patch[] = {
 static int cs35lxx_spk_power_on(struct cs35lxx_private *cs35lxx)
 {
 	regmap_multi_reg_write(cs35lxx->regmap, cs35lxx_spk_power_on_patch,
-			       ARRAY_SIZE(cs35lxx_spk_power_on_patch));
+			     ARRAY_SIZE(cs35lxx_spk_power_on_patch));
 
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_PWR_CTRL1,
-			   CS35LXX_GLOBAL_EN_MASK,
-			   1 << CS35LXX_GLOBAL_EN_SHIFT);
+			  CS35LXX_GLOBAL_EN_MASK,
+			  1 << CS35LXX_GLOBAL_EN_SHIFT);
 
 	usleep_range(1000, 1100);
 
@@ -404,8 +403,8 @@ static int cs35lxx_spk_power_on(struct cs35lxx_private *cs35lxx)
 static int cs35lxx_spk_power_off(struct cs35lxx_private *cs35lxx)
 {
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_PWR_CTRL1,
-			   CS35LXX_GLOBAL_EN_MASK,
-			   0 << CS35LXX_GLOBAL_EN_SHIFT);
+			  CS35LXX_GLOBAL_EN_MASK,
+			  0 << CS35LXX_GLOBAL_EN_SHIFT);
 
 	usleep_range(1000, 1100);
 
@@ -417,32 +416,32 @@ static int cs35lxx_spk_power_off(struct cs35lxx_private *cs35lxx)
 static int cs35lxx_boost_inductor(struct cs35lxx_private *cs35lxx, int inductor)
 {
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_COEFF,
-			   CS35LXX_BSTCVRT_K1_MASK, 0x3C);
+			  CS35LXX_BSTCVRT_K1_MASK, 0x3C);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_COEFF,
-			   CS35LXX_BSTCVRT_K2_MASK,
-			   0x3C << CS35LXX_BSTCVRT_K2_SHIFT);
+			  CS35LXX_BSTCVRT_K2_MASK,
+			  0x3C << CS35LXX_BSTCVRT_K2_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SW_FREQ,
-			   CS35LXX_BSTCVRT_CCMFREQ_MASK, 0x00);
+			  CS35LXX_BSTCVRT_CCMFREQ_MASK, 0x00);
 
 	switch (inductor) {
-	case 1000: /* 1 uH */
-		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
-				   CS35LXX_BSTCVRT_SLOPE_MASK,
-				   0x75 << CS35LXX_BSTCVRT_SLOPE_SHIFT);
-		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
-				   CS35LXX_BSTCVRT_LBSTVAL_MASK, 0x00);
-		break;
-	case 1200: /* 1.2 uH */
-		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
-				   CS35LXX_BSTCVRT_SLOPE_MASK,
-				   0x6B << CS35LXX_BSTCVRT_SLOPE_SHIFT);
-		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
-				   CS35LXX_BSTCVRT_LBSTVAL_MASK, 0x01);
-		break;
-	default:
-		dev_err(cs35lxx->dev, "%s Invalid Inductor Value %d uH\n",
-			__func__, inductor);
-		return -EINVAL;
+		case 1000: /* 1 uH */
+			regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
+					  CS35LXX_BSTCVRT_SLOPE_MASK,
+					  0x75 << CS35LXX_BSTCVRT_SLOPE_SHIFT);
+			regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
+					  CS35LXX_BSTCVRT_LBSTVAL_MASK, 0x00);
+			break;
+		case 1200: /* 1.2 uH */
+			regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
+					  CS35LXX_BSTCVRT_SLOPE_MASK,
+					  0x6B << CS35LXX_BSTCVRT_SLOPE_SHIFT);
+			regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_SLOPE_LBST,
+					  CS35LXX_BSTCVRT_LBSTVAL_MASK, 0x01);
+			break;
+		default:
+			dev_err(cs35lxx->dev, "%s Invalid Inductor Value %d uH\n",
+				__func__, inductor);
+			return -EINVAL;
 	}
 
 	return 0;
@@ -450,24 +449,24 @@ static int cs35lxx_boost_inductor(struct cs35lxx_private *cs35lxx, int inductor)
 
 static int cs35lxx_probe(struct cs35lxx_private *cs35lxx)
 {
-	int ret = 0;
+	int ret;
 
 	if ((cs35lxx->rev_id == CS35LXX_REV_A0) && cs35lxx->pdata.dcm_mode) {
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_DCM_CTRL,
-				   CS35LXX_DCM_AUTO_MASK,
-				   CS35LXX_DCM_AUTO_MASK);
+				  CS35LXX_DCM_AUTO_MASK,
+				  CS35LXX_DCM_AUTO_MASK);
 
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-			     CS35LXX_TEST_UNLOCK1);
+			    CS35LXX_TEST_UNLOCK1);
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-			     CS35LXX_TEST_UNLOCK2);
+			    CS35LXX_TEST_UNLOCK2);
 
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BST_TST_MANUAL,
-				   CS35LXX_BST_MAN_IPKCOMP_MASK,
-				   0 << CS35LXX_BST_MAN_IPKCOMP_SHIFT);
+				  CS35LXX_BST_MAN_IPKCOMP_MASK,
+				  0 << CS35LXX_BST_MAN_IPKCOMP_SHIFT);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BST_TST_MANUAL,
-				   CS35LXX_BST_MAN_IPKCOMP_EN_MASK,
-				   CS35LXX_BST_MAN_IPKCOMP_EN_MASK);
+				  CS35LXX_BST_MAN_IPKCOMP_EN_MASK,
+				  CS35LXX_BST_MAN_IPKCOMP_EN_MASK);
 
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
 				CS35LXX_TEST_LOCK1);
@@ -477,36 +476,36 @@ static int cs35lxx_probe(struct cs35lxx_private *cs35lxx)
 
 	if (cs35lxx->pdata.amp_pcm_inv)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_AMP_DIG_VOL_CTRL,
-				   CS35LXX_AMP_PCM_INV_MASK,
-				   CS35LXX_AMP_PCM_INV_MASK);
+				  CS35LXX_AMP_PCM_INV_MASK,
+				  CS35LXX_AMP_PCM_INV_MASK);
 
 	if (cs35lxx->pdata.multi_amp_mode)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_ASP_TX_PIN_CTRL,
-				   CS35LXX_ASP_TX_HIZ_MASK,
-				   CS35LXX_ASP_TX_HIZ_MASK);
+				  CS35LXX_ASP_TX_HIZ_MASK,
+				  CS35LXX_ASP_TX_HIZ_MASK);
 
 	if (cs35lxx->pdata.imon_pol_inv)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_VI_SPKMON_FILT,
-				   CS35LXX_IMON_POL_MASK, 0);
+				  CS35LXX_IMON_POL_MASK, 0);
 
 	if (cs35lxx->pdata.vmon_pol_inv)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_VI_SPKMON_FILT,
-				   CS35LXX_VMON_POL_MASK, 0);
+				  CS35LXX_VMON_POL_MASK, 0);
 
 	if (cs35lxx->pdata.bst_vctl)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_VCTRL1,
-				   CS35LXX_BSTCVRT_CTL_MASK,
-				   cs35lxx->pdata.bst_vctl);
+				  CS35LXX_BSTCVRT_CTL_MASK,
+				  cs35lxx->pdata.bst_vctl);
 
 	if (cs35lxx->pdata.bst_vctl_sel)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_VCTRL2,
-				   CS35LXX_BSTCVRT_CTL_SEL_MASK,
-				   cs35lxx->pdata.bst_vctl_sel);
+				  CS35LXX_BSTCVRT_CTL_SEL_MASK,
+				  cs35lxx->pdata.bst_vctl_sel);
 
 	if (cs35lxx->pdata.bst_ipk)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_PEAK_CUR,
-				   CS35LXX_BST_IPK_MASK,
-				   cs35lxx->pdata.bst_ipk);
+				  CS35LXX_BST_IPK_MASK,
+				  cs35lxx->pdata.bst_ipk);
 
 	if (cs35lxx->pdata.boost_ind) {
 		ret = cs35lxx_boost_inductor(cs35lxx, cs35lxx->pdata.boost_ind);
@@ -519,20 +518,20 @@ static int cs35lxx_probe(struct cs35lxx_private *cs35lxx)
 
 	if (cs35lxx->pdata.temp_warn_thld)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_DTEMP_WARN_THLD,
-				   CS35LXX_TEMP_THLD_MASK,
-				   cs35lxx->pdata.temp_warn_thld);
+				  CS35LXX_TEMP_THLD_MASK,
+				  cs35lxx->pdata.temp_warn_thld);
 
 	if (cs35lxx->pdata.irq_drv_sel)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PAD_INTERFACE,
-				   CS35LXX_INT_DRV_SEL_MASK,
-				   cs35lxx->pdata.irq_drv_sel <<
-				   CS35LXX_INT_DRV_SEL_SHIFT);
+				  CS35LXX_INT_DRV_SEL_MASK,
+				  cs35lxx->pdata.irq_drv_sel <<
+				  CS35LXX_INT_DRV_SEL_SHIFT);
 
 	if (cs35lxx->pdata.irq_gpio_sel)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PAD_INTERFACE,
-				   CS35LXX_INT_GPIO_SEL_MASK,
-				   cs35lxx->pdata.irq_gpio_sel <<
-				   CS35LXX_INT_GPIO_SEL_SHIFT);
+				  CS35LXX_INT_GPIO_SEL_MASK,
+				  cs35lxx->pdata.irq_gpio_sel <<
+				  CS35LXX_INT_GPIO_SEL_SHIFT);
 
 	/*
 	 * Rev B0 has 2 versions
@@ -544,29 +543,29 @@ static int cs35lxx_probe(struct cs35lxx_private *cs35lxx)
 	 */
 	if (cs35lxx->chip_version == CS35LXX_10V_L36) {
 		regmap_update_bits(cs35lxx->regmap,
-				   CS35LXX_BSTCVRT_OVERVOLT_CTRL,
-				   CS35LXX_BST_OVP_THLD_MASK,
-				   CS35LXX_BST_OVP_THLD_11V);
+				  CS35LXX_BSTCVRT_OVERVOLT_CTRL,
+				  CS35LXX_BST_OVP_THLD_MASK,
+				  CS35LXX_BST_OVP_THLD_11V);
 
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-			     CS35LXX_TEST_UNLOCK1);
+			    CS35LXX_TEST_UNLOCK1);
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-			     CS35LXX_TEST_UNLOCK2);
+			    CS35LXX_TEST_UNLOCK2);
 
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BST_ANA2_TEST,
-				   CS35LXX_BST_OVP_TRIM_MASK,
-				   CS35LXX_BST_OVP_TRIM_11V <<
-				   CS35LXX_BST_OVP_TRIM_SHIFT);
+				  CS35LXX_BST_OVP_TRIM_MASK,
+				  CS35LXX_BST_OVP_TRIM_11V <<
+				  CS35LXX_BST_OVP_TRIM_SHIFT);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_VCTRL2,
-				   CS35LXX_BST_CTRL_LIM_MASK,
-				   1 << CS35LXX_BST_CTRL_LIM_SHIFT);
+				  CS35LXX_BST_CTRL_LIM_MASK,
+				  1 << CS35LXX_BST_CTRL_LIM_SHIFT);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_BSTCVRT_VCTRL1,
-				   CS35LXX_BSTCVRT_CTL_MASK,
-				   CS35LXX_BST_CTRL_10V_CLAMP);
+				  CS35LXX_BSTCVRT_CTL_MASK,
+				  CS35LXX_BST_CTRL_10V_CLAMP);
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-			     CS35LXX_TEST_LOCK1);
+			    CS35LXX_TEST_LOCK1);
 		regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-			     CS35LXX_TEST_LOCK2);
+			    CS35LXX_TEST_LOCK2);
 	}
 
 	/*
@@ -575,64 +574,64 @@ static int cs35lxx_probe(struct cs35lxx_private *cs35lxx)
 	 * Just turn it off from default
 	 */
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_CTRL_OVRRIDE,
-			   CS35LXX_SYNC_GLOBAL_OVR_MASK,
-			   0 << CS35LXX_SYNC_GLOBAL_OVR_SHIFT);
+			  CS35LXX_SYNC_GLOBAL_OVR_MASK,
+			  0 << CS35LXX_SYNC_GLOBAL_OVR_SHIFT);
 
 	// Apply ASP Config
 	if (cs35lxx->pdata.asp_config.asp_fmt)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_ASP_FORMAT,
-				   CS35LXX_ASP_FMT_MASK,
-				   cs35lxx->pdata.asp_config.asp_fmt << CS35LXX_ASP_FMT_SHIFT);
+				  CS35LXX_ASP_FMT_MASK,
+				  cs35lxx->pdata.asp_config.asp_fmt << CS35LXX_ASP_FMT_SHIFT);
 
 	if (cs35lxx->pdata.asp_config.asp_rx_width)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_ASP_FRAME_CTRL,
-				   CS35LXX_ASP_RX_WIDTH_MASK,
-				   cs35lxx->pdata.asp_config.asp_rx_width <<
-				   CS35LXX_ASP_RX_WIDTH_SHIFT);
+				  CS35LXX_ASP_RX_WIDTH_MASK,
+				  cs35lxx->pdata.asp_config.asp_rx_width <<
+				  CS35LXX_ASP_RX_WIDTH_SHIFT);
 
 	if (cs35lxx->pdata.asp_config.asp_tx_width)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_ASP_FRAME_CTRL,
-				   CS35LXX_ASP_TX_WIDTH_MASK,
-				   cs35lxx->pdata.asp_config.asp_tx_width <<
-				   CS35LXX_ASP_TX_WIDTH_SHIFT);
+				  CS35LXX_ASP_TX_WIDTH_MASK,
+				  cs35lxx->pdata.asp_config.asp_tx_width <<
+				  CS35LXX_ASP_TX_WIDTH_SHIFT);
 
 	if (cs35lxx->pdata.asp_config.asp_sample_rate)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_GLOBAL_CLK_CTRL,
-				   CS35LXX_GLOBAL_FS_MASK,
-				   cs35lxx->pdata.asp_config.asp_sample_rate <<
-				   CS35LXX_GLOBAL_FS_SHIFT);
+				  CS35LXX_GLOBAL_FS_MASK,
+				  cs35lxx->pdata.asp_config.asp_sample_rate <<
+				  CS35LXX_GLOBAL_FS_SHIFT);
 
 	if (cs35lxx->pdata.asp_config.asp_sclk_rate)
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_ASP_TX_PIN_CTRL,
-				   CS35LXX_SCLK_FREQ_MASK,
-				   cs35lxx->pdata.asp_config.asp_sclk_rate);
+				  CS35LXX_SCLK_FREQ_MASK,
+				  cs35lxx->pdata.asp_config.asp_sclk_rate);
 
 	// Apply PLL Config
 	if ((cs35lxx->pdata.pll_refclk_freq & CS35LXX_VALID_PDATA) |
-	    (cs35lxx->pdata.pll_refclk_sel & CS35LXX_VALID_PDATA)) {
+	   (cs35lxx->pdata.pll_refclk_sel & CS35LXX_VALID_PDATA)) {
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PLL_CLK_CTRL,
-				   CS35LXX_PLL_OPENLOOP_MASK,
-				   1 << CS35LXX_PLL_OPENLOOP_SHIFT);
+				  CS35LXX_PLL_OPENLOOP_MASK,
+				  1 << CS35LXX_PLL_OPENLOOP_SHIFT);
 
 		if (cs35lxx->pdata.pll_refclk_freq & CS35LXX_VALID_PDATA)
 			regmap_update_bits(cs35lxx->regmap, CS35LXX_PLL_CLK_CTRL,
-				   CS35LXX_REFCLK_FREQ_MASK,
-				   cs35lxx->pdata.pll_refclk_freq << CS35LXX_REFCLK_FREQ_SHIFT);
+				  CS35LXX_REFCLK_FREQ_MASK,
+				  cs35lxx->pdata.pll_refclk_freq << CS35LXX_REFCLK_FREQ_SHIFT);
 
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PLL_CLK_CTRL,
-				   CS35LXX_PLL_REFCLK_EN_MASK,
-				   0 << CS35LXX_PLL_REFCLK_EN_SHIFT);
+				  CS35LXX_PLL_REFCLK_EN_MASK,
+				  0 << CS35LXX_PLL_REFCLK_EN_SHIFT);
 		if (cs35lxx->pdata.pll_refclk_freq & CS35LXX_VALID_PDATA)
 			regmap_update_bits(cs35lxx->regmap, CS35LXX_PLL_CLK_CTRL,
-				   CS35LXX_PLL_CLK_SEL_MASK,
-				   cs35lxx->pdata.pll_refclk_sel);
+				  CS35LXX_PLL_CLK_SEL_MASK,
+				  cs35lxx->pdata.pll_refclk_sel);
 
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PLL_CLK_CTRL,
 				  CS35LXX_PLL_OPENLOOP_MASK,
-				   0 << CS35LXX_PLL_OPENLOOP_SHIFT);
+				  0 << CS35LXX_PLL_OPENLOOP_SHIFT);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PLL_CLK_CTRL,
-				   CS35LXX_PLL_REFCLK_EN_MASK,
-				   1 << CS35LXX_PLL_REFCLK_EN_SHIFT);
+				  CS35LXX_PLL_REFCLK_EN_MASK,
+				  1 << CS35LXX_PLL_REFCLK_EN_SHIFT);
 	}
 	return 0;
 }
@@ -678,85 +677,85 @@ static irqreturn_t cs35lxx_irq(int irq, void *data)
 	if (status[2] & CS35LXX_AMP_SHORT_ERR) {
 		dev_crit(cs35lxx->dev, "Amp short error\n");
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_AMP_SHORT_ERR_RLS, 0);
+				  CS35LXX_AMP_SHORT_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_AMP_SHORT_ERR_RLS,
-				   CS35LXX_AMP_SHORT_ERR_RLS);
+				  CS35LXX_AMP_SHORT_ERR_RLS,
+				  CS35LXX_AMP_SHORT_ERR_RLS);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_AMP_SHORT_ERR_RLS, 0);
+				  CS35LXX_AMP_SHORT_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_INT3_STATUS,
-				   CS35LXX_AMP_SHORT_ERR,
-				   CS35LXX_AMP_SHORT_ERR);
+				  CS35LXX_AMP_SHORT_ERR,
+				  CS35LXX_AMP_SHORT_ERR);
 		ret = IRQ_HANDLED;
 	}
 
 	if (status[0] & CS35LXX_TEMP_WARN) {
 		dev_crit(cs35lxx->dev, "Over temperature warning\n");
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_WARN_ERR_RLS, 0);
+				  CS35LXX_TEMP_WARN_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_WARN_ERR_RLS,
-				   CS35LXX_TEMP_WARN_ERR_RLS);
+				  CS35LXX_TEMP_WARN_ERR_RLS,
+				  CS35LXX_TEMP_WARN_ERR_RLS);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_WARN_ERR_RLS, 0);
+				  CS35LXX_TEMP_WARN_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_INT1_STATUS,
-				   CS35LXX_TEMP_WARN, CS35LXX_TEMP_WARN);
+				  CS35LXX_TEMP_WARN, CS35LXX_TEMP_WARN);
 		ret = IRQ_HANDLED;
 	}
 
 	if (status[0] & CS35LXX_TEMP_ERR) {
 		dev_crit(cs35lxx->dev, "Over temperature error\n");
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_ERR_RLS, 0);
+				  CS35LXX_TEMP_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_ERR_RLS, CS35LXX_TEMP_ERR_RLS);
+				  CS35LXX_TEMP_ERR_RLS, CS35LXX_TEMP_ERR_RLS);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_ERR_RLS, 0);
+				  CS35LXX_TEMP_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_INT1_STATUS,
-				   CS35LXX_TEMP_ERR, CS35LXX_TEMP_ERR);
+				  CS35LXX_TEMP_ERR, CS35LXX_TEMP_ERR);
 		ret = IRQ_HANDLED;
 	}
 
 	if (status[0] & CS35LXX_BST_OVP_ERR) {
 		dev_crit(cs35lxx->dev, "VBST Over Voltage error\n");
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_ERR_RLS, 0);
+				  CS35LXX_TEMP_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_ERR_RLS, CS35LXX_TEMP_ERR_RLS);
+				  CS35LXX_TEMP_ERR_RLS, CS35LXX_TEMP_ERR_RLS);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_TEMP_ERR_RLS, 0);
+				  CS35LXX_TEMP_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_INT1_STATUS,
-				   CS35LXX_BST_OVP_ERR, CS35LXX_BST_OVP_ERR);
+				  CS35LXX_BST_OVP_ERR, CS35LXX_BST_OVP_ERR);
 		ret = IRQ_HANDLED;
 	}
 
 	if (status[0] & CS35LXX_BST_DCM_UVP_ERR) {
 		dev_crit(cs35lxx->dev, "DCM VBST Under Voltage Error\n");
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_BST_UVP_ERR_RLS, 0);
+				  CS35LXX_BST_UVP_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_BST_UVP_ERR_RLS,
-				   CS35LXX_BST_UVP_ERR_RLS);
+				  CS35LXX_BST_UVP_ERR_RLS,
+				  CS35LXX_BST_UVP_ERR_RLS);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_BST_UVP_ERR_RLS, 0);
+				  CS35LXX_BST_UVP_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_INT1_STATUS,
-				   CS35LXX_BST_DCM_UVP_ERR,
-				   CS35LXX_BST_DCM_UVP_ERR);
+				  CS35LXX_BST_DCM_UVP_ERR,
+				  CS35LXX_BST_DCM_UVP_ERR);
 		ret = IRQ_HANDLED;
 	}
 
 	if (status[0] & CS35LXX_BST_SHORT_ERR) {
 		dev_crit(cs35lxx->dev, "LBST SHORT error!\n");
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_BST_SHORT_ERR_RLS, 0);
+				  CS35LXX_BST_SHORT_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_BST_SHORT_ERR_RLS,
-				   CS35LXX_BST_SHORT_ERR_RLS);
+				  CS35LXX_BST_SHORT_ERR_RLS,
+				  CS35LXX_BST_SHORT_ERR_RLS);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_PROTECT_REL_ERR,
-				   CS35LXX_BST_SHORT_ERR_RLS, 0);
+				  CS35LXX_BST_SHORT_ERR_RLS, 0);
 		regmap_update_bits(cs35lxx->regmap, CS35LXX_INT1_STATUS,
-				   CS35LXX_BST_SHORT_ERR,
-				   CS35LXX_BST_SHORT_ERR);
+				  CS35LXX_BST_SHORT_ERR,
+				  CS35LXX_BST_SHORT_ERR);
 		ret = IRQ_HANDLED;
 	}
 
@@ -934,23 +933,23 @@ static int cs35lxx_pac(struct cs35lxx_private *cs35lxx)
 	 * Magic code for internal PAC
 	 */
 	regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-		     CS35LXX_TEST_UNLOCK1);
+		    CS35LXX_TEST_UNLOCK1);
 	regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-		     CS35LXX_TEST_UNLOCK2);
+		    CS35LXX_TEST_UNLOCK2);
 
 	usleep_range(9500, 10500);
 
 	regmap_write(cs35lxx->regmap, CS35LXX_PAC_CTL1,
-		     CS35LXX_PAC_RESET);
+		    CS35LXX_PAC_RESET);
 	regmap_write(cs35lxx->regmap, CS35LXX_PAC_CTL3,
-		     CS35LXX_PAC_MEM_ACCESS);
+		    CS35LXX_PAC_MEM_ACCESS);
 	regmap_write(cs35lxx->regmap, CS35LXX_PAC_PMEM_WORD0,
-		     CS35LXX_B0_PAC_PATCH);
+		    CS35LXX_B0_PAC_PATCH);
 
 	regmap_write(cs35lxx->regmap, CS35LXX_PAC_CTL3,
-		     CS35LXX_PAC_MEM_ACCESS_CLR);
+		    CS35LXX_PAC_MEM_ACCESS_CLR);
 	regmap_write(cs35lxx->regmap, CS35LXX_PAC_CTL1,
-		     CS35LXX_PAC_ENABLE_MASK);
+		    CS35LXX_PAC_ENABLE_MASK);
 
 	usleep_range(9500, 10500);
 
@@ -978,14 +977,14 @@ static int cs35lxx_pac(struct cs35lxx_private *cs35lxx)
 	}
 
 	regmap_write(cs35lxx->regmap, CS35LXX_INT4_STATUS,
-		     CS35LXX_MCU_CONFIG_CLR);
+		    CS35LXX_MCU_CONFIG_CLR);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_PAC_CTL1,
-			   CS35LXX_PAC_ENABLE_MASK, 0);
+			  CS35LXX_PAC_ENABLE_MASK, 0);
 
 	regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-		     CS35LXX_TEST_LOCK1);
+		    CS35LXX_TEST_LOCK1);
 	regmap_write(cs35lxx->regmap, CS35LXX_TESTKEY_CTRL,
-		     CS35LXX_TEST_LOCK2);
+		    CS35LXX_TEST_LOCK2);
 
 	return 0;
 }
@@ -996,42 +995,42 @@ static void cs35lxx_apply_vpbr_config(struct cs35lxx_private *cs35lxx)
 	struct cs35lxx_vpbr_cfg *vpbr_config = &pdata->vpbr_config;
 
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_PWR_CTRL3,
-			   CS35LXX_VPBR_EN_MASK,
-			   vpbr_config->vpbr_en <<
-			   CS35LXX_VPBR_EN_SHIFT);
+			  CS35LXX_VPBR_EN_MASK,
+			  vpbr_config->vpbr_en <<
+			  CS35LXX_VPBR_EN_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_THLD_MASK,
-			   vpbr_config->vpbr_thld <<
-			   CS35LXX_VPBR_THLD_SHIFT);
+			  CS35LXX_VPBR_THLD_MASK,
+			  vpbr_config->vpbr_thld <<
+			  CS35LXX_VPBR_THLD_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_MAX_ATTN_MASK,
-			   vpbr_config->vpbr_max_attn <<
-			   CS35LXX_VPBR_MAX_ATTN_SHIFT);
+			  CS35LXX_VPBR_MAX_ATTN_MASK,
+			  vpbr_config->vpbr_max_attn <<
+			  CS35LXX_VPBR_MAX_ATTN_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_ATK_VOL_MASK,
-			   vpbr_config->vpbr_atk_vol <<
-			   CS35LXX_VPBR_ATK_VOL_SHIFT);
+			  CS35LXX_VPBR_ATK_VOL_MASK,
+			  vpbr_config->vpbr_atk_vol <<
+			  CS35LXX_VPBR_ATK_VOL_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_ATK_RATE_MASK,
-			   vpbr_config->vpbr_atk_rate <<
-			   CS35LXX_VPBR_ATK_RATE_SHIFT);
+			  CS35LXX_VPBR_ATK_RATE_MASK,
+			  vpbr_config->vpbr_atk_rate <<
+			  CS35LXX_VPBR_ATK_RATE_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_WAIT_MASK,
-			   vpbr_config->vpbr_wait <<
-			   CS35LXX_VPBR_WAIT_SHIFT);
+			  CS35LXX_VPBR_WAIT_MASK,
+			  vpbr_config->vpbr_wait <<
+			  CS35LXX_VPBR_WAIT_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_REL_RATE_MASK,
-			   vpbr_config->vpbr_rel_rate <<
-			   CS35LXX_VPBR_REL_RATE_SHIFT);
+			  CS35LXX_VPBR_REL_RATE_MASK,
+			  vpbr_config->vpbr_rel_rate <<
+			  CS35LXX_VPBR_REL_RATE_SHIFT);
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_VPBR_CFG,
-			   CS35LXX_VPBR_MUTE_EN_MASK,
-			   vpbr_config->vpbr_mute_en <<
-			   CS35LXX_VPBR_MUTE_EN_SHIFT);
+			  CS35LXX_VPBR_MUTE_EN_MASK,
+			  vpbr_config->vpbr_mute_en <<
+			  CS35LXX_VPBR_MUTE_EN_SHIFT);
 }
 
 static int cs35lxx_send_data_to_dsp(struct cs35lxx_private *cs35lxx)
 {
-	int ret = 0;
+	int ret;
 	uint32_t *dsp_send_buffer;
 
 	dsp_send_buffer = kmalloc(sizeof(struct cs35lxx_calib_cmd), GFP_KERNEL);
@@ -1059,7 +1058,7 @@ exit:
 
 static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 {
-	int ret = 0;
+	int ret;
 	uint32_t data_length = 0;
 
 	if (!cs35lxx->dsp_recv_buffer) {
@@ -1086,7 +1085,7 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 static int cs35lxx_get_calib_struct(struct cs35lxx_private *cs35lxx)
 {
-	int ret = 0;
+	int ret;
 
 	ret = cs35lxx_receive_data_from_dsp(cs35lxx);
 	if (ret) {
@@ -1111,7 +1110,7 @@ static void cs35lxx_calibration_start(struct work_struct *wk)
 {
 	struct cs35lxx_private *cs35lxx;
 	cs35lxx = container_of(wk, struct cs35lxx_private, calib_work);
-	int i = 0, ret = 0;
+	int i, ret;
 	int try_times = 5;
 
 	// CSPL handshake
@@ -1126,7 +1125,7 @@ static void cs35lxx_calibration_start(struct work_struct *wk)
 		}
 
 		cs35lxx->calib_param.command = CSPL_CMD_START_CALIBRATION;
-		cs35lxx->calib_param.data.temperature =cs35lxx->ambient_temperature;
+		cs35lxx->calib_param.data.temperature = cs35lxx->ambient_temperature;
 		ret = cs35lxx_send_data_to_dsp(cs35lxx);
 		dev_info(cs35lxx->dev, "calibration_start cmd had sent, ret  = %d\n", ret);
 
@@ -1146,7 +1145,7 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 	struct miscdevice *dev = f->private_data;
 	struct cs35lxx_private *cs35lxx;
 	struct cs35lxx_calib_data *calib_param;
-	int ret = 0, val;
+	int ret, val;
 
 	cs35lxx = container_of(dev, struct cs35lxx_private, misc_dev);
 
@@ -1159,105 +1158,105 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 	}
 
 	switch (cmd) {
-	case CS35LXX_SPK_DAC_VOLUME:
-		break;
-	case CS35LXX_SPK_POWER_ON:
-		ret = cs35lxx_spk_power_on(cs35lxx);
-		break;
-	case CS35LXX_SPK_POWER_OFF:
-		ret = cs35lxx_spk_power_off(cs35lxx);
-		break;
-	case CS35LXX_SPK_DSP_BYPASS:
-		if (val == 1) {
-			cs35lxx->calib_param.command = CSPL_CMD_ENABLE_DSPBYPASS;
-		} else if (val == 0) {
-			cs35lxx->calib_param.command = CSPL_CMD_DISABLE_DSPBYPASS;
-		} else {
-			dev_err(cs35lxx->dev, "Unsupported value %d\n", val);
-			ret = -EFAULT;
-			goto exit;
-		}
-		ret = cs35lxx_send_data_to_dsp(cs35lxx);
-		break;
-	case CS35LXX_SPK_SWITCH_CALIBRATION:
-		break;
-	case CS35LXX_SPK_SWITCH_CONFIGURATION:
-		break;
-	case CS35LXX_SPK_GET_R0:
-		dev_info(cs35lxx->dev, "CS35LXX_SPK_GET_R0\n");
-		ret = cs35lxx_get_calib_struct(cs35lxx);
-		if (ret) {
-			dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
-			ret = -EFAULT;
-			goto exit;
-		}
-		if (copy_to_user((uint32_t *) arg,
-						 &cs35lxx->calib_param.data.rdc,
-						 sizeof(uint32_t))) {
-			dev_err(cs35lxx->dev, "copy to user failed\n");
-			ret = -EFAULT;
-			goto exit;
-		}
-		break;
-	case CS35LXX_SPK_GET_F0:
-		break;
-	case CS35LXX_SPK_GET_CAL_STRUCT:
-		ret = cs35lxx_get_calib_struct(cs35lxx);
-		if (ret) {
-			dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
-			ret = -EFAULT;
-			goto exit;
-		}
-		if (copy_to_user((struct cs35lxx_calib_data *)arg,
-						  &cs35lxx->calib_param.data,
-						  sizeof(struct cs35lxx_calib_data))) {
-			dev_err(cs35lxx->dev, "copy to user failed\n");
-			ret = -EFAULT;
-			goto exit;
-		}
-		break;
-	case CS35LXX_SPK_SET_CAL_STRUCT:
-		calib_param = kmalloc(sizeof(struct cs35lxx_calib_data), GFP_KERNEL);
-		if (copy_from_user(calib_param, arg, sizeof(struct cs35lxx_calib_data))) {
-			dev_err(cs35lxx->dev, "copy from user failed\n");
-			ret = -EFAULT;
-			goto exit;
-		}
-		cs35lxx->calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
-		cs35lxx->calib_param.data.temperature = calib_param->temperature;
-		cs35lxx->calib_param.data.rdc = calib_param->rdc;
-		cs35lxx->calib_param.data.status = calib_param->status;
-		cs35lxx->calib_param.data.checksum = calib_param->checksum;
+		case CS35LXX_SPK_DAC_VOLUME:
+			break;
+		case CS35LXX_SPK_POWER_ON:
+			ret = cs35lxx_spk_power_on(cs35lxx);
+			break;
+		case CS35LXX_SPK_POWER_OFF:
+			ret = cs35lxx_spk_power_off(cs35lxx);
+			break;
+		case CS35LXX_SPK_DSP_BYPASS:
+			if (val == 1) {
+				cs35lxx->calib_param.command = CSPL_CMD_ENABLE_DSPBYPASS;
+			} else if (val == 0) {
+				cs35lxx->calib_param.command = CSPL_CMD_DISABLE_DSPBYPASS;
+			} else {
+				dev_err(cs35lxx->dev, "Unsupported value %d\n", val);
+				ret = -EFAULT;
+				goto exit;
+			}
+			ret = cs35lxx_send_data_to_dsp(cs35lxx);
+			break;
+		case CS35LXX_SPK_SWITCH_CALIBRATION:
+			break;
+		case CS35LXX_SPK_SWITCH_CONFIGURATION:
+			break;
+		case CS35LXX_SPK_GET_R0:
+			dev_info(cs35lxx->dev, "CS35LXX_SPK_GET_R0\n");
+			ret = cs35lxx_get_calib_struct(cs35lxx);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			if (copy_to_user((uint32_t *) arg,
+							 &cs35lxx->calib_param.data.rdc,
+							 sizeof(uint32_t))) {
+				dev_err(cs35lxx->dev, "copy to user failed\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			break;
+		case CS35LXX_SPK_GET_F0:
+			break;
+		case CS35LXX_SPK_GET_CAL_STRUCT:
+			ret = cs35lxx_get_calib_struct(cs35lxx);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			if (copy_to_user((struct cs35lxx_calib_data *)arg,
+							  &cs35lxx->calib_param.data,
+							  sizeof(struct cs35lxx_calib_data))) {
+				dev_err(cs35lxx->dev, "copy to user failed\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			break;
+		case CS35LXX_SPK_SET_CAL_STRUCT:
+			calib_param = kmalloc(sizeof(struct cs35lxx_calib_data), GFP_KERNEL);
+			if (copy_from_user(calib_param, arg, sizeof(struct cs35lxx_calib_data))) {
+				dev_err(cs35lxx->dev, "copy from user failed\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			cs35lxx->calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
+			cs35lxx->calib_param.data.temperature = calib_param->temperature;
+			cs35lxx->calib_param.data.rdc = calib_param->rdc;
+			cs35lxx->calib_param.data.status = calib_param->status;
+			cs35lxx->calib_param.data.checksum = calib_param->checksum;
 
-		ret = cs35lxx_send_data_to_dsp(cs35lxx);
-		kfree(calib_param);
-		break;
-	case CS35LXX_SPK_SET_AMBIENT:
-		dev_info(cs35lxx->dev, "copy from user val = %d\n", val);
-		cs35lxx->ambient_temperature = val;
-		break;
-	case CS35LXX_SPK_SET_R0:
-		break;
-	case CS35LXX_SPK_SWITCH_FIRMWARE:
-		break;
-	case CS35LXX_SPK_GET_R0_REALTIME:
-		break;
-	case CS35LXX_SPK_SET_DEFAULT_CALIB:
-		break;
-	case CS35LXX_SPK_GET_CALIB_STATE:
-		break;
-	case CS35LXX_SPK_START_CALIBRATION:
-		atomic_set(&cs35lxx->calib_monitor, 1);
-		queue_work(cs35lxx->calib_wq, &cs35lxx->calib_work);
-		break;
-	case CS35LXX_SPK_STOP_CALIBRATION:
-		cancel_work_sync(&cs35lxx->calib_work);
-		flush_workqueue(cs35lxx->calib_wq);
-		ret = cs35lxx_calibration_stop(cs35lxx);
-		break;
-	default:
-		dev_err(cs35lxx->dev, "Invalid IOCTL, command = %d\n", cmd);
-		return -EINVAL;
+			ret = cs35lxx_send_data_to_dsp(cs35lxx);
+			kfree(calib_param);
+			break;
+		case CS35LXX_SPK_SET_AMBIENT:
+			dev_info(cs35lxx->dev, "copy from user val = %d\n", val);
+			cs35lxx->ambient_temperature = val;
+			break;
+		case CS35LXX_SPK_SET_R0:
+			break;
+		case CS35LXX_SPK_SWITCH_FIRMWARE:
+			break;
+		case CS35LXX_SPK_GET_R0_REALTIME:
+			break;
+		case CS35LXX_SPK_SET_DEFAULT_CALIB:
+			break;
+		case CS35LXX_SPK_GET_CALIB_STATE:
+			break;
+		case CS35LXX_SPK_START_CALIBRATION:
+			atomic_set(&cs35lxx->calib_monitor, 1);
+			queue_work(cs35lxx->calib_wq, &cs35lxx->calib_work);
+			break;
+		case CS35LXX_SPK_STOP_CALIBRATION:
+			cancel_work_sync(&cs35lxx->calib_work);
+			flush_workqueue(cs35lxx->calib_wq);
+			ret = cs35lxx_calibration_stop(cs35lxx);
+			break;
+		default:
+			dev_err(cs35lxx->dev, "Invalid IOCTL, command = %d\n", cmd);
+			return -EINVAL;
 	}
 
 exit:
@@ -1267,14 +1266,14 @@ exit:
 }
 
 static long cs35lxx_unlocked_ioctl(struct file *f, unsigned int cmd,
-								   unsigned long arg)
+				unsigned long arg)
 {
 	return cs35lxx_ioctl(f, cmd, (void __user *)arg);
 }
 
 #ifdef CONFIG_COMPAT
 static long cs35lxx_compat_ioctl(struct file *f, unsigned int cmd,
-								 unsigned long arg)
+				unsigned long arg)
 {
 	struct miscdevice *dev = f->private_data;
 	struct cs35lxx_private *cs35lxx;
@@ -1283,60 +1282,60 @@ static long cs35lxx_compat_ioctl(struct file *f, unsigned int cmd,
 	cs35lxx = container_of(dev, struct cs35lxx_private, misc_dev);
 
 	switch (cmd) {
-	case CS35LXX_SPK_DAC_VOLUME_COMPAT:
-		cmd64 = CS35LXX_SPK_DAC_VOLUME;
-		break;
-	case CS35LXX_SPK_POWER_ON_COMPAT:
-		cmd64 = CS35LXX_SPK_POWER_ON;
-		break;
-	case CS35LXX_SPK_POWER_OFF_COMPAT:
-		cmd64 = CS35LXX_SPK_POWER_OFF;
-		break;
-	case CS35LXX_SPK_DSP_BYPASS_COMPAT:
-		cmd64 = CS35LXX_SPK_DSP_BYPASS;
-		break;
-	case CS35LXX_SPK_SWITCH_CONFIGURATION_COMPAT:
-		cmd64 = CS35LXX_SPK_SWITCH_CONFIGURATION;
-		break;
-	case CS35LXX_SPK_SWITCH_CALIBRATION_COMPAT:
-		cmd64 = CS35LXX_SPK_SWITCH_CALIBRATION;
-		break;
-	case CS35LXX_SPK_GET_R0_COMPAT:
-		cmd64 = CS35LXX_SPK_GET_R0;
-		break;
-	case CS35LXX_SPK_GET_F0_COMPAT:
-		cmd64 = CS35LXX_SPK_GET_F0;
-		break;
-	case CS35LXX_SPK_GET_CAL_STRUCT_COMPAT:
-		cmd64 = CS35LXX_SPK_GET_CAL_STRUCT;
-		break;
-	case CS35LXX_SPK_SET_CAL_STRUCT_COMPAT:
-		cmd64 = CS35LXX_SPK_SET_CAL_STRUCT;
-		break;
-	case CS35LXX_SPK_SET_AMBIENT_COMPAT:
-		cmd64 = CS35LXX_SPK_SET_AMBIENT;
-		break;
-	case CS35LXX_SPK_SWITCH_FIRMWARE_COMPAT:
-		cmd64 = CS35LXX_SPK_SWITCH_FIRMWARE;
-		break;
-	case CS35LXX_SPK_GET_R0_REALTIME_COMPAT:
-		cmd64 = CS35LXX_SPK_GET_R0_REALTIME;
-		break;
-	case CS35LXX_SPK_SET_DEFAULT_CALIB_COMPAT:
-		cmd64 = CS35LXX_SPK_SET_DEFAULT_CALIB;
-		break;
-	case CS35LXX_SPK_GET_CALIB_STATE_COMPAT:
-		cmd64 = CS35LXX_SPK_GET_CALIB_STATE;
-		break;
-	case CS35LXX_SPK_START_CALIBRATION_COMPAT:
-		cmd64 = CS35LXX_SPK_START_CALIBRATION;
-		break;
-	case CS35LXX_SPK_STOP_CALIBRATION_COMPAT:
-		cmd64 = CS35LXX_SPK_STOP_CALIBRATION;
-		break;
-	default:
-		dev_err(cs35lxx->dev, "Invalid IOCTL, command = %d\n", cmd);
-		return -EINVAL;
+		case CS35LXX_SPK_DAC_VOLUME_COMPAT:
+			cmd64 = CS35LXX_SPK_DAC_VOLUME;
+			break;
+		case CS35LXX_SPK_POWER_ON_COMPAT:
+			cmd64 = CS35LXX_SPK_POWER_ON;
+			break;
+		case CS35LXX_SPK_POWER_OFF_COMPAT:
+			cmd64 = CS35LXX_SPK_POWER_OFF;
+			break;
+		case CS35LXX_SPK_DSP_BYPASS_COMPAT:
+			cmd64 = CS35LXX_SPK_DSP_BYPASS;
+			break;
+		case CS35LXX_SPK_SWITCH_CONFIGURATION_COMPAT:
+			cmd64 = CS35LXX_SPK_SWITCH_CONFIGURATION;
+			break;
+		case CS35LXX_SPK_SWITCH_CALIBRATION_COMPAT:
+			cmd64 = CS35LXX_SPK_SWITCH_CALIBRATION;
+			break;
+		case CS35LXX_SPK_GET_R0_COMPAT:
+			cmd64 = CS35LXX_SPK_GET_R0;
+			break;
+		case CS35LXX_SPK_GET_F0_COMPAT:
+			cmd64 = CS35LXX_SPK_GET_F0;
+			break;
+		case CS35LXX_SPK_GET_CAL_STRUCT_COMPAT:
+			cmd64 = CS35LXX_SPK_GET_CAL_STRUCT;
+			break;
+		case CS35LXX_SPK_SET_CAL_STRUCT_COMPAT:
+			cmd64 = CS35LXX_SPK_SET_CAL_STRUCT;
+			break;
+		case CS35LXX_SPK_SET_AMBIENT_COMPAT:
+			cmd64 = CS35LXX_SPK_SET_AMBIENT;
+			break;
+		case CS35LXX_SPK_SWITCH_FIRMWARE_COMPAT:
+			cmd64 = CS35LXX_SPK_SWITCH_FIRMWARE;
+			break;
+		case CS35LXX_SPK_GET_R0_REALTIME_COMPAT:
+			cmd64 = CS35LXX_SPK_GET_R0_REALTIME;
+			break;
+		case CS35LXX_SPK_SET_DEFAULT_CALIB_COMPAT:
+			cmd64 = CS35LXX_SPK_SET_DEFAULT_CALIB;
+			break;
+		case CS35LXX_SPK_GET_CALIB_STATE_COMPAT:
+			cmd64 = CS35LXX_SPK_GET_CALIB_STATE;
+			break;
+		case CS35LXX_SPK_START_CALIBRATION_COMPAT:
+			cmd64 = CS35LXX_SPK_START_CALIBRATION;
+			break;
+		case CS35LXX_SPK_STOP_CALIBRATION_COMPAT:
+			cmd64 = CS35LXX_SPK_STOP_CALIBRATION;
+			break;
+		default:
+			dev_err(cs35lxx->dev, "Invalid IOCTL, command = %d\n", cmd);
+			return -EINVAL;
 	}
 
 	return cs35lxx_ioctl(f, cmd64, compat_ptr(arg));
@@ -1407,7 +1406,7 @@ static const struct file_operations cs35lxx_fops = {
 };
 
 static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
-			      const struct i2c_device_id *id)
+				const struct i2c_device_id *id)
 {
 	struct cs35lxx_private *cs35lxx;
 	struct device *dev = &i2c_client->dev;
@@ -1436,7 +1435,7 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 		cs35lxx->supplies[i].supply = cs35lxx_supplies[i];
 
 	ret = devm_regulator_bulk_get(dev, cs35lxx->num_supplies,
-				      cs35lxx->supplies);
+				    cs35lxx->supplies);
 	if (ret != 0) {
 		dev_err(dev, "Failed to request core supplies: %d\n", ret);
 		return ret;
@@ -1446,7 +1445,7 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 		cs35lxx->pdata = *pdata;
 	} else {
 		pdata = devm_kzalloc(dev, sizeof(struct cs35lxx_platform_data),
-				     GFP_KERNEL);
+				    GFP_KERNEL);
 		if (!pdata)
 			return -ENOMEM;
 
@@ -1454,7 +1453,6 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 			ret = cs35lxx_handle_of_data(i2c_client, pdata);
 			if (ret != 0)
 				return ret;
-
 		}
 
 		cs35lxx->pdata = *pdata;
@@ -1468,7 +1466,7 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 
 	/* returning NULL can be an option if in stereo mode */
 	cs35lxx->reset_gpio = devm_gpiod_get_optional(dev, "reset",
-						      GPIOD_OUT_LOW);
+						    GPIOD_OUT_LOW);
 	if (IS_ERR(cs35lxx->reset_gpio)) {
 		ret = PTR_ERR(cs35lxx->reset_gpio);
 		cs35lxx->reset_gpio = NULL;
@@ -1524,32 +1522,33 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 		cs35lxx->chip_version = CS35LXX_10V_L36;
 
 	switch (cs35lxx->rev_id) {
-	case CS35LXX_REV_A0:
-		ret = regmap_register_patch(cs35lxx->regmap,
-				cs35lxx_reva0_errata_patch,
-				ARRAY_SIZE(cs35lxx_reva0_errata_patch));
-		if (ret < 0) {
-			dev_err(dev, "Failed to apply A0 errata patch %d\n",
-				ret);
-			goto err;
-		}
-		break;
-	case CS35LXX_REV_B0:
-		ret = cs35lxx_pac(cs35lxx);
-		if (ret < 0) {
-			dev_err(dev, "Failed to Trim OTP %d\n", ret);
-			goto err;
-		}
+		case CS35LXX_REV_B0:
+			ret = cs35lxx_pac(cs35lxx);
+			if (ret < 0) {
+				dev_err(dev, "Failed to Trim OTP %d\n", ret);
+				goto err;
+			}
 
-		ret = regmap_register_patch(cs35lxx->regmap,
-				cs35lxx_revb0_errata_patch,
-				ARRAY_SIZE(cs35lxx_revb0_errata_patch));
-		if (ret < 0) {
-			dev_err(dev, "Failed to apply B0 errata patch %d\n",
-				ret);
-			goto err;
-		}
-		break;
+			ret = regmap_register_patch(cs35lxx->regmap,
+					cs35lxx_revb0_errata_patch,
+					ARRAY_SIZE(cs35lxx_revb0_errata_patch));
+			if (ret < 0) {
+				dev_err(dev, "Failed to apply B0 errata patch %d\n",
+					ret);
+				goto err;
+			}
+			break;
+		case CS35LXX_REV_A0:
+		default:
+			ret = regmap_register_patch(cs35lxx->regmap,
+					cs35lxx_reva0_errata_patch,
+					ARRAY_SIZE(cs35lxx_reva0_errata_patch));
+			if (ret < 0) {
+				dev_err(dev, "Failed to apply A0 errata patch %d\n",
+					ret);
+				goto err;
+			}
+			break;
 	}
 
 	if (pdata->vpbr_config.is_present)
@@ -1575,23 +1574,23 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 	}
 
 	switch (irq_pol) {
-	case IRQF_TRIGGER_FALLING:
-	case IRQF_TRIGGER_LOW:
-		chip_irq_pol = 0;
-		break;
-	case IRQF_TRIGGER_RISING:
-	case IRQF_TRIGGER_HIGH:
-		chip_irq_pol = 1;
-		break;
-	default:
-		dev_err(cs35lxx->dev, "Invalid IRQ polarity: %d\n", irq_pol);
-		ret = -EINVAL;
-		goto err;
+		case IRQF_TRIGGER_FALLING:
+		case IRQF_TRIGGER_LOW:
+			chip_irq_pol = 0;
+			break;
+		case IRQF_TRIGGER_RISING:
+		case IRQF_TRIGGER_HIGH:
+			chip_irq_pol = 1;
+			break;
+		default:
+			dev_err(cs35lxx->dev, "Invalid IRQ polarity: %d\n", irq_pol);
+			ret = -EINVAL;
+			goto err;
 	}
 
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_PAD_INTERFACE,
-			   CS35LXX_INT_POL_SEL_MASK,
-			   chip_irq_pol << CS35LXX_INT_POL_SEL_SHIFT);
+			  CS35LXX_INT_POL_SEL_MASK,
+			  chip_irq_pol << CS35LXX_INT_POL_SEL_SHIFT);
 
 	ret = devm_request_threaded_irq(dev, irq_gpio, NULL, cs35lxx_irq,
 					IRQF_ONESHOT | irq_pol, "cs35lxx",
@@ -1602,13 +1601,13 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 	}
 
 	regmap_update_bits(cs35lxx->regmap, CS35LXX_PAD_INTERFACE,
-			   CS35LXX_INT_OUTPUT_EN_MASK, 1);
+			  CS35LXX_INT_OUTPUT_EN_MASK, 1);
 
 	/* Set interrupt masks for critical errors */
 	regmap_write(cs35lxx->regmap, CS35LXX_INT1_MASK,
-		     CS35LXX_INT1_MASK_DEFAULT);
+		    CS35LXX_INT1_MASK_DEFAULT);
 	regmap_write(cs35lxx->regmap, CS35LXX_INT3_MASK,
-		     CS35LXX_INT3_MASK_DEFAULT);
+		    CS35LXX_INT3_MASK_DEFAULT);
 
 	ret = cs35lxx_probe(cs35lxx);
 	if (ret < 0) {
@@ -1664,9 +1663,9 @@ static int cs35lxx_i2c_remove(struct i2c_client *client)
 
 	/* Reset interrupt masks for device removal */
 	regmap_write(cs35lxx->regmap, CS35LXX_INT1_MASK,
-		     CS35LXX_INT1_MASK_RESET);
+		    CS35LXX_INT1_MASK_RESET);
 	regmap_write(cs35lxx->regmap, CS35LXX_INT3_MASK,
-		     CS35LXX_INT3_MASK_RESET);
+		    CS35LXX_INT3_MASK_RESET);
 
 	if (cs35lxx->reset_gpio)
 		gpiod_set_value_cansleep(cs35lxx->reset_gpio, 0);
@@ -1710,16 +1709,16 @@ static int __init cs35lxx_i2c_init(void)
 	ret = i2c_add_driver(&cs35lxx_i2c_driver);
 	if (ret)
 		pr_err("%s: cs35lxx driver add failed", __func__);
+
 	return ret;
 }
 
-//late init call due to smartpakit requirement
+// late init call due to smartpakit requirement
 late_initcall_sync(cs35lxx_i2c_init);
 static void __exit cs35lxx_i2c_exit(void)
 {
 	i2c_del_driver(&cs35lxx_i2c_driver);
 }
-
 module_exit(cs35lxx_i2c_exit);
 
 MODULE_DESCRIPTION("Misc CS35LXX driver");
