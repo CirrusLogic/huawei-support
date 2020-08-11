@@ -21,12 +21,18 @@
 #include <linux/vmalloc.h>
 #include <linux/workqueue.h>
 #include <asm/atomic.h>
+#ifdef CONFIG_COMPAT
+#include <linux/compat.h>
+#endif
 
 #include <linux/platform_data/cs35lxx.h>
+#include "cs35lxx.h"
 /* MTK platform header */
 #include <mtk-sp-spk-amp.h>
 
-#include "cs35lxx.h"
+#include "smartpakit.h"
+#define VENDOR_ID_CIRRUS 3
+
 
 /*
  * Some fields take zero as a valid value so use a high bit flag that won't
@@ -1408,6 +1414,7 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 	struct cs35lxx_platform_data *pdata = dev_get_platdata(dev);
 	int ret, irq_pol, chip_irq_pol, i;
 	u32 reg_id, reg_revid, l37_id_reg;
+	struct smartpa_vendor_info vendor_info;
 	int irq_gpio = 0;
 
 	cs35lxx = devm_kzalloc(dev, sizeof(struct cs35lxx_private), GFP_KERNEL);
@@ -1473,8 +1480,12 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 		}
 	}
 
-	if (cs35lxx->reset_gpio)
+	if (cs35lxx->reset_gpio) {
 		gpiod_set_value_cansleep(cs35lxx->reset_gpio, 1);
+		usleep_range(2000, 2100);
+		gpiod_set_value_cansleep(cs35lxx->reset_gpio, 0);
+		usleep_range(1000, 1100);
+	}
 
 	usleep_range(2000, 2100);
 
@@ -1629,6 +1640,14 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 
 	dev_info(dev, "Register misc driver successful\n");
 
+	vendor_info.vendor = VENDOR_ID_CIRRUS;
+	vendor_info.chip_model = "cs35lxx";
+	ret = smartpakit_set_info(&vendor_info);
+	if (ret != 0) {
+		dev_err(dev, "cs35lxx failed to smartpakit_set_info: %d\n", ret);
+		goto err;
+	}
+
 	return 0;
 
 err:
@@ -1683,7 +1702,25 @@ static struct i2c_driver cs35lxx_i2c_driver = {
 	.probe = cs35lxx_i2c_probe,
 	.remove = cs35lxx_i2c_remove,
 };
-module_i2c_driver(cs35lxx_i2c_driver);
+
+static int __init cs35lxx_i2c_init(void)
+{
+	int ret  = -1;
+	pr_info("%s: cs35lxx driver init", __func__);
+	ret = i2c_add_driver(&cs35lxx_i2c_driver);
+	if (ret)
+		pr_err("%s: cs35lxx driver add failed", __func__);
+	return ret;
+}
+
+//late init call due to smartpakit requirement
+late_initcall_sync(cs35lxx_i2c_init);
+static void __exit cs35lxx_i2c_exit(void)
+{
+	i2c_del_driver(&cs35lxx_i2c_driver);
+}
+
+module_exit(cs35lxx_i2c_exit);
 
 MODULE_DESCRIPTION("Misc CS35LXX driver");
 MODULE_AUTHOR("Qi Zhou <qizhou@opensource.cirrus.com>");
