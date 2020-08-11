@@ -1167,6 +1167,16 @@ static long cs35l36_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		ret = cs35l36_spk_power_off(cs35l36);
 		break;
 	case CS35L36_SPK_DSP_BYPASS:
+		if (val == 1) {
+			cs35l36->calib_param.command = CSPL_CMD_ENABLE_DSPBYPASS;
+		} else if (val == 0) {
+			cs35l36->calib_param.command = CSPL_CMD_DISABLE_DSPBYPASS;
+		} else {
+			dev_err(cs35l36->dev, "Unsupported value %d\n", val);
+			ret = -EFAULT;
+			goto exit;
+		}
+		ret = cs35l36_send_data_to_dsp(cs35l36);
 		break;
 	case CS35L36_SPK_SWITCH_CALIBRATION:
 		break;
