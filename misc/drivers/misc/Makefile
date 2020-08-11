@@ -3,7 +3,7 @@
 # Makefile for misc devices that really don't fit anywhere else.
 #
 
-misc-cs35l36-objs := cs35l36.o
+misc-cs35lxx-objs := cs35lxx.o
 
 obj-$(CONFIG_IBM_ASM)		+= ibmasm/
 obj-$(CONFIG_AD525X_DPOT)	+= ad525x_dpot.o
@@ -59,7 +59,7 @@ obj-$(CONFIG_ASPEED_LPC_CTRL)	+= aspeed-lpc-ctrl.o
 obj-$(CONFIG_ASPEED_LPC_SNOOP)	+= aspeed-lpc-snoop.o
 obj-$(CONFIG_PCI_ENDPOINT_TEST)	+= pci_endpoint_test.o
 subdir-ccflags-y += -I$(srctree)/sound/soc/mediatek/common
-obj-$(CONFIG_MISC_CS35L36)	+= misc-cs35l36.o
+obj-$(CONFIG_MISC_CS35LXX)	+= misc-cs35lxx.o
 
 lkdtm-$(CONFIG_LKDTM)		+= lkdtm_core.o
 lkdtm-$(CONFIG_LKDTM)		+= lkdtm_bugs.o

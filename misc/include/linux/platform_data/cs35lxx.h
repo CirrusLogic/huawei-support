@@ -1,5 +1,5 @@
 /*
- * linux/sound/cs35l36.h  --  CS35L36 Platform data
+ * linux/sound/cs35lxx.h  --  CS35LXX Platform data
  *
  * Copyright 2020 Cirrus Logic, Inc.
  *
@@ -7,10 +7,10 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#ifndef __CS35L36_H
-#define __CS35L36_H
+#ifndef __CS35LXX_H
+#define __CS35LXX_H
 
-struct cs35l36_vpbr_cfg {
+struct cs35lxx_vpbr_cfg {
 	bool is_present;
 	bool vpbr_en;
 	int vpbr_thld;
@@ -30,7 +30,7 @@ struct asp_cfg {
 	int asp_sclk_rate;
 };
 
-struct cs35l36_platform_data {
+struct cs35lxx_platform_data {
 	bool multi_amp_mode;
 	bool dcm_mode;
 	bool amp_pcm_inv;
@@ -46,8 +46,8 @@ struct cs35l36_platform_data {
 	int irq_gpio_sel;
 	int pll_refclk_sel;
 	int pll_refclk_freq;
-	struct cs35l36_vpbr_cfg vpbr_config;
+	struct cs35lxx_vpbr_cfg vpbr_config;
 	struct asp_cfg asp_config;
 };
 
-#endif /* __CS35L36_H */
+#endif /* __CS35LXX_H */

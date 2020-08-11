@@ -506,8 +506,8 @@ config PCI_ENDPOINT_TEST
            Enable this configuration option to enable the host side test driver
            for PCI Endpoint.
 
-config MISC_CS35L36
-	tristate "Cirrus Logic CS35L36 Amplifier misc driver"
+config MISC_CS35LXX
+	tristate "Cirrus Logic CS35LXX Amplifier misc driver"
 	depends on I2C
 
 source "drivers/misc/c2port/Kconfig"
