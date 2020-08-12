@@ -1,8 +1,8 @@
-CS35L36 Speaker Amplifier
+CS35LXX Speaker Amplifier
 
 Required properties:
 
-  - compatible : "cirrus,cs35l36"
+  - compatible : "cirrus,cs35lxx"
 
   - reg : the I2C address of the device for I2C
 
@@ -350,8 +350,8 @@ Optional properties for the "cirrus,asp-config" Sub-node
 
 Example:
 
-cs35l36: cs35l36@40 {
-	compatible = "cirrus,cs35l36";
+cs35lxx: cs35lxx@40 {
+	compatible = "cirrus,cs35lxx";
 	reg = <0x40>;
 	VA-supply = <&dummy_vreg>;
 	VP-supply = <&dummy_vreg>;
