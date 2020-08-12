@@ -39,6 +39,8 @@
  */
 #define CS35LXX_VALID_PDATA 0x80000000
 
+#define CS35LXX_IOCTL_STATUS_OK 0
+
 static const char * const cs35lxx_supplies[] = {
 	"VA",
 	"VP",
@@ -1197,6 +1199,7 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 				ret = -EFAULT;
 				goto exit;
 			}
+			ret = CS35LXX_IOCTL_STATUS_OK;
 			break;
 		case CS35LXX_SPK_GET_F0:
 			break;
@@ -1234,6 +1237,7 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		case CS35LXX_SPK_SET_AMBIENT:
 			dev_info(cs35lxx->dev, "copy from user val = %d\n", val);
 			cs35lxx->ambient_temperature = val;
+			ret = CS35LXX_IOCTL_STATUS_OK;
 			break;
 		case CS35LXX_SPK_SET_R0:
 			break;
