@@ -464,6 +464,8 @@ extern const int cs35lxx_a0_pac_patch[CS35LXX_PAC_PROG_MEM];
 #define CS35LXX_SPK_GET_CALIB_STATE		_IOWR(CS35LXX_MAGIC_NUMBER, 16, void *)
 #define CS35LXX_SPK_START_CALIBRATION	_IOWR(CS35LXX_MAGIC_NUMBER, 17, void *)
 #define CS35LXX_SPK_STOP_CALIBRATION	_IOWR(CS35LXX_MAGIC_NUMBER, 18, void *)
+#define CS35LXX_SPK_START_DIAGNOSTICS	_IOWR(CS35LXX_MAGIC_NUMBER, 19, void *)
+#define CS35LXX_SPK_STOP_DIAGNOSTICS	_IOWR(CS35LXX_MAGIC_NUMBER, 20, void *)
 
 #ifdef CONFIG_COMPAT
 #define CS35LXX_SPK_DAC_VOLUME_COMPAT	\
@@ -502,6 +504,10 @@ extern const int cs35lxx_a0_pac_patch[CS35LXX_PAC_PROG_MEM];
 								_IOWR(CS35LXX_MAGIC_NUMBER, 17, compat_uptr_t)
 #define CS35LXX_SPK_STOP_CALIBRATION_COMPAT	\
 								_IOWR(CS35LXX_MAGIC_NUMBER, 18, compat_uptr_t)
+#define CS35LXX_SPK_START_DIAGNOSTICS_COMPAT	\
+								_IOWR(CS35LXX_MAGIC_NUMBER, 19, compat_uptr_t)
+#define CS35LXX_SPK_STOP_DIAGNOSTICS_COMPAT	\
+								_IOWR(CS35LXX_MAGIC_NUMBER, 20, compat_uptr_t)
 #endif
 
 // Structs for Aurisys API
@@ -517,6 +523,39 @@ struct cs35lxx_calib_cmd {
 	struct cs35lxx_calib_data data;
 };
 
+struct cs35lxx_r0_data {
+	int32_t empty1;
+	int32_t r0;
+	int32_t empty2;
+	int32_t empty3;
+	int32_t empty4;
+};
+
+struct cs35lxx_r0_cmd {
+	uint32_t command;
+	struct cs35lxx_r0_data data;
+};
+
+struct cs35lxx_diagnostics_param {
+	int32_t temperature;
+	int32_t f0;
+	int32_t status;
+	int32_t empty2;
+	int32_t empty3;
+};
+
+struct cs35lxx_diagnostics_cmd {
+	uint32_t command;
+	struct cs35lxx_diagnostics_param data;
+};
+
+enum cs35lxx_cspl_cmd_type {
+	CSPL_CMD_CALIBRATION	= 1,
+	CSPL_CMD_DIAGNOSTICS	= 2,
+	CSPL_CMD_R0				= 3
+};
+
+
 enum cs35lxx_cspl_arsi_command {
 	CSPL_CMD_START_CALIBRATION		= 2020,
 	CSPL_CMD_STOP_CALIBRATION		= 2021,
@@ -526,6 +565,8 @@ enum cs35lxx_cspl_arsi_command {
 	CSPL_CMD_GET_CALIBRATION_PARAM	= 2025,
 	CSPL_CMD_LIBARAY_READY			= 2026,
 	CSPL_CMD_ENABLE_DSPBYPASS		= 2027,
-	CSPL_CMD_DISABLE_DSPBYPASS		= 2028
+	CSPL_CMD_DISABLE_DSPBYPASS		= 2028,
+	CSPL_CMD_GET_R0					= 2029,
+	CSPL_CMD_GET_F0					= 2030
 };
 #endif /* __CS35LXX_H */

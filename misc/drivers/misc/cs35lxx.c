@@ -40,10 +40,33 @@
 #define CS35LXX_VALID_PDATA 0x80000000
 
 #define CS35LXX_IOCTL_STATUS_OK 0
+#define CS35LXX_CSPL_HANDSHAKE_MAX_TRY_TIME 5
 
 static const char * const cs35lxx_supplies[] = {
 	"VA",
 	"VP",
+};
+
+struct cs35lxx_cspl {
+	struct workqueue_struct *calib_wq;
+	struct work_struct calib_work;
+	atomic_t calib_monitor;
+
+	struct workqueue_struct *diag_wq;
+	struct work_struct diag_work;
+	atomic_t diag_monitor;
+
+	struct workqueue_struct *set_cal_struct_wq;
+	struct work_struct set_cal_struct_work;
+	atomic_t set_cal_struct_monitor;
+
+	int cspl_cmd_type;
+	struct cs35lxx_calib_cmd calib_param;
+	struct cs35lxx_r0_cmd r0_param;
+	struct cs35lxx_diagnostics_cmd diag_param;
+	uint32_t *dsp_recv_buffer;
+	uint32_t ambient_temperature;
+	bool cspl_ready;
 };
 
 struct cs35lxx_private {
@@ -58,13 +81,7 @@ struct cs35lxx_private {
 	struct gpio_desc *irq_gpio;
 	struct mutex lock;
 	struct miscdevice misc_dev;
-
-	struct workqueue_struct *calib_wq;
-	struct work_struct calib_work;
-	atomic_t calib_monitor;
-	struct cs35lxx_calib_cmd calib_param;
-	uint32_t *dsp_recv_buffer;
-	uint32_t ambient_temperature;
+	struct cs35lxx_cspl cspl;
 };
 
 static struct reg_default cs35lxx_reg[] = {
@@ -1032,25 +1049,52 @@ static void cs35lxx_apply_vpbr_config(struct cs35lxx_private *cs35lxx)
 
 static int cs35lxx_send_data_to_dsp(struct cs35lxx_private *cs35lxx)
 {
-	int ret;
+	int ret = 0;
 	uint32_t *dsp_send_buffer;
 
-	dsp_send_buffer = kmalloc(sizeof(struct cs35lxx_calib_cmd), GFP_KERNEL);
-	if (!dsp_send_buffer) {
-		dev_err(cs35lxx->dev, "Failed to allocate memory for buffer\n");
-		return -ENOMEM;
-	}
-	dsp_send_buffer[0] = cs35lxx->calib_param.command;
-	dsp_send_buffer[1] = cs35lxx->calib_param.data.temperature;
-	dsp_send_buffer[2] = cs35lxx->calib_param.data.rdc;
-	dsp_send_buffer[3] = cs35lxx->calib_param.data.status;
-	dsp_send_buffer[4] = cs35lxx->calib_param.data.checksum;
+	switch (cs35lxx->cspl.cspl_cmd_type) {
+		case CSPL_CMD_CALIBRATION:
+			dsp_send_buffer = kmalloc(sizeof(struct cs35lxx_calib_cmd), GFP_KERNEL);
+			if (!dsp_send_buffer) {
+				dev_err(cs35lxx->dev, "Failed to allocate memory for buffer\n");
+				return -ENOMEM;
+			}
 
-	ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer,
-									  (sizeof(struct cs35lxx_calib_cmd)));
-	if (ret) {
-		dev_err(cs35lxx->dev, "Failed send buffer to the DSP %d\n", ret);
-		goto exit;
+			dsp_send_buffer[0] = cs35lxx->cspl.calib_param.command;
+			dsp_send_buffer[1] = cs35lxx->cspl.calib_param.data.temperature;
+			dsp_send_buffer[2] = cs35lxx->cspl.calib_param.data.rdc;
+			dsp_send_buffer[3] = cs35lxx->cspl.calib_param.data.status;
+			dsp_send_buffer[4] = cs35lxx->cspl.calib_param.data.checksum;
+
+			ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer,
+											  (sizeof(struct cs35lxx_calib_cmd)));
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed send buffer to the DSP %d\n", ret);
+				goto exit;
+			}
+			break;
+		case CSPL_CMD_DIAGNOSTICS:
+			dsp_send_buffer = kmalloc(sizeof(struct cs35lxx_diagnostics_cmd), GFP_KERNEL);
+			if (!dsp_send_buffer) {
+				dev_err(cs35lxx->dev, "Failed to allocate memory for buffer\n");
+				return -ENOMEM;
+			}
+			dsp_send_buffer[0] = cs35lxx->cspl.diag_param.command;
+			dsp_send_buffer[1] = cs35lxx->cspl.diag_param.data.temperature;
+			dsp_send_buffer[2] = cs35lxx->cspl.diag_param.data.f0;
+			dsp_send_buffer[3] = cs35lxx->cspl.diag_param.data.status;
+
+			ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer,
+											  (sizeof(struct cs35lxx_diagnostics_cmd)));
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed send buffer to the DSP %d\n", ret);
+				goto exit;
+			}
+			break;
+		default:
+			dev_err(cs35lxx->dev, "Unsupported command\n");
+			ret = -EINVAL;
+			break;
 	}
 
 exit:
@@ -1060,28 +1104,62 @@ exit:
 
 static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 {
-	int ret;
+	int ret = 0;
 	uint32_t data_length = 0;
 
-	if (!cs35lxx->dsp_recv_buffer) {
+	if (!cs35lxx->cspl.dsp_recv_buffer) {
 		dev_err(cs35lxx->dev, "Failed to allocate memory for buffer\n");
 		return -ENOMEM;
 	}
-	ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->dsp_recv_buffer,
-										sizeof(struct cs35lxx_calib_cmd),
-										&data_length);
-	if (ret) {
-		dev_err(cs35lxx->dev, "Failed to read calib struct from the DSP\n");
-		return -EFAULT;
+
+	switch (cs35lxx->cspl.cspl_cmd_type) {
+		case CSPL_CMD_CALIBRATION:
+			ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->cspl.dsp_recv_buffer,
+												sizeof(struct cs35lxx_calib_cmd),
+												&data_length);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to read buffer from the DSP\n");
+				return -EFAULT;
+			}
+
+			cs35lxx->cspl.calib_param.command = cs35lxx->cspl.dsp_recv_buffer[0];
+			cs35lxx->cspl.calib_param.data.temperature = cs35lxx->cspl.dsp_recv_buffer[1];
+			cs35lxx->cspl.calib_param.data.rdc = cs35lxx->cspl.dsp_recv_buffer[2];
+			cs35lxx->cspl.calib_param.data.status = cs35lxx->cspl.dsp_recv_buffer[3];
+			cs35lxx->cspl.calib_param.data.checksum = cs35lxx->cspl.dsp_recv_buffer[4];
+
+			break;
+		case CSPL_CMD_R0:
+			ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->cspl.dsp_recv_buffer,
+												sizeof(struct cs35lxx_r0_cmd),
+												&data_length);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to read buffer from the DSP\n");
+				return -EFAULT;
+			}
+
+			cs35lxx->cspl.r0_param.command = cs35lxx->cspl.dsp_recv_buffer[0];
+			cs35lxx->cspl.r0_param.data.r0 = cs35lxx->cspl.dsp_recv_buffer[2];
+
+			break;
+		case CSPL_CMD_DIAGNOSTICS:
+			ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->cspl.dsp_recv_buffer,
+												sizeof(struct cs35lxx_diagnostics_cmd),
+												&data_length);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to read buffer from the DSP\n");
+				return -EFAULT;
+			}
+
+			cs35lxx->cspl.diag_param.command = cs35lxx->cspl.dsp_recv_buffer[0];
+			cs35lxx->cspl.diag_param.data.f0 = cs35lxx->cspl.dsp_recv_buffer[2];
+			cs35lxx->cspl.diag_param.data.status = cs35lxx->cspl.dsp_recv_buffer[2];
+			break;
+		default:
+			dev_err(cs35lxx->dev, "Unsupported command\n");
+			ret = -EINVAL;
+			break;
 	}
-	dev_info(cs35lxx->dev, "Read calib struct data len = %d\n", data_length);
-
-	cs35lxx->calib_param.command = cs35lxx->dsp_recv_buffer[0];
-	cs35lxx->calib_param.data.temperature = cs35lxx->dsp_recv_buffer[1];
-	cs35lxx->calib_param.data.rdc = cs35lxx->dsp_recv_buffer[2];
-	cs35lxx->calib_param.data.status = cs35lxx->dsp_recv_buffer[3];
-	cs35lxx->calib_param.data.checksum = cs35lxx->dsp_recv_buffer[4];
-
 	return ret;
 }
 
@@ -1089,21 +1167,78 @@ static int cs35lxx_get_calib_struct(struct cs35lxx_private *cs35lxx)
 {
 	int ret;
 
+	cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
 	ret = cs35lxx_receive_data_from_dsp(cs35lxx);
 	if (ret) {
 		dev_err(cs35lxx->dev, "Failed to read calib struct from the DSP\n");
 		return ret;
 	}
-	if (cs35lxx->calib_param.command != CSPL_CMD_GET_CALIBRATION_PARAM) {
-		dev_err(cs35lxx->dev, "Calib cmd type does not match\n");
+	if (cs35lxx->cspl.calib_param.command != CSPL_CMD_GET_CALIBRATION_PARAM) {
+		dev_err(cs35lxx->dev, "Command does not match\n");
 		return -EINVAL;
 	}
 
 	dev_info(cs35lxx->dev, "Read cal struct:\n");
-	dev_info(cs35lxx->dev, "\tStatus: %d\n", cs35lxx->calib_param.data.status);
-	dev_info(cs35lxx->dev, "\tRDC: 0x%x\n", cs35lxx->calib_param.data.rdc);
-	dev_info(cs35lxx->dev, "\tAmbient: %d\n", cs35lxx->calib_param.data.temperature);
-	dev_info(cs35lxx->dev, "\tChecksum: 0x%x\n", cs35lxx->calib_param.data.checksum);
+	dev_info(cs35lxx->dev, "\tStatus: %d\n", cs35lxx->cspl.calib_param.data.status);
+	dev_info(cs35lxx->dev, "\tRDC: 0x%x\n", cs35lxx->cspl.calib_param.data.rdc);
+	dev_info(cs35lxx->dev, "\tAmbient: %d\n", cs35lxx->cspl.calib_param.data.temperature);
+	dev_info(cs35lxx->dev, "\tChecksum: 0x%x\n", cs35lxx->cspl.calib_param.data.checksum);
+
+	return ret;
+}
+
+static void cs35lxx_set_cal_struct(struct work_struct *wk)
+{
+	struct cs35lxx_private *cs35lxx;
+	int i;
+	int ret;
+	int try_times = CS35LXX_CSPL_HANDSHAKE_MAX_TRY_TIME;
+
+	cs35lxx = container_of(container_of(wk, struct cs35lxx_cspl,
+						   set_cal_struct_work),
+						   struct cs35lxx_private, cspl);
+
+	// CSPL handshake
+	cs35lxx->cspl.cspl_ready = false;
+	while (atomic_read(&cs35lxx->cspl.set_cal_struct_monitor)) {
+		for (i = 0; i < try_times; i++) {
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
+			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
+			if (ret == 0 && cs35lxx->cspl.calib_param.command == CSPL_CMD_LIBARAY_READY) {
+				dev_info(cs35lxx->dev, "CSPL is ready\n");
+				cs35lxx->cspl.cspl_ready = true;
+				break;
+			}
+			usleep_range(200000, 200100);
+		}
+
+		if (cs35lxx->cspl.cspl_ready) {
+			cs35lxx->cspl.calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
+			ret = cs35lxx_send_data_to_dsp(cs35lxx);
+		}
+
+		atomic_set(&cs35lxx->cspl.set_cal_struct_monitor, 0);
+	}
+}
+
+static int cs35lxx_get_r0(struct cs35lxx_private *cs35lxx)
+{
+	int ret;
+
+	cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_R0;
+	ret = cs35lxx_receive_data_from_dsp(cs35lxx);
+	if (ret) {
+		dev_err(cs35lxx->dev, "Failed to read r0 from the DSP\n");
+		return ret;
+	}
+	if (cs35lxx->cspl.r0_param.command != CSPL_CMD_GET_R0) {
+		dev_err(cs35lxx->dev, "Command does not match\n");
+		return -EINVAL;
+	}
+
+	dev_info(cs35lxx->dev, "Read r0 struct:\n");
+	dev_info(cs35lxx->dev, "\tT_realtime: 0x%x\n", cs35lxx->cspl.r0_param.data.r0);
 
 	return ret;
 }
@@ -1111,43 +1246,119 @@ static int cs35lxx_get_calib_struct(struct cs35lxx_private *cs35lxx)
 static void cs35lxx_calibration_start(struct work_struct *wk)
 {
 	struct cs35lxx_private *cs35lxx;
-	cs35lxx = container_of(wk, struct cs35lxx_private, calib_work);
-	int i, ret;
-	int try_times = 5;
+	int i;
+	int ret;
+	int try_times = CS35LXX_CSPL_HANDSHAKE_MAX_TRY_TIME;
+
+	cs35lxx = container_of(container_of(wk, struct cs35lxx_cspl, calib_work),
+						   struct cs35lxx_private, cspl);
 
 	// CSPL handshake
-	while (atomic_read(&cs35lxx->calib_monitor)) {
+	cs35lxx->cspl.cspl_ready = false;
+	while (atomic_read(&cs35lxx->cspl.calib_monitor)) {
 		for (i = 0; i < try_times; i++) {
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
 			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
-			if (ret == 0 && cs35lxx->calib_param.command == CSPL_CMD_LIBARAY_READY) {
+			if (ret == 0 && cs35lxx->cspl.calib_param.command == CSPL_CMD_LIBARAY_READY) {
 				dev_info(cs35lxx->dev, "CSPL is ready\n");
+				cs35lxx->cspl.cspl_ready = true;
 				break;
 			}
 			usleep_range(200000, 200100);
 		}
 
-		cs35lxx->calib_param.command = CSPL_CMD_START_CALIBRATION;
-		cs35lxx->calib_param.data.temperature = cs35lxx->ambient_temperature;
-		ret = cs35lxx_send_data_to_dsp(cs35lxx);
-		dev_info(cs35lxx->dev, "calibration_start cmd had sent, ret  = %d\n", ret);
+		if (cs35lxx->cspl.cspl_ready) {
+			cs35lxx->cspl.calib_param.command = CSPL_CMD_START_CALIBRATION;
+			cs35lxx->cspl.calib_param.data.temperature = cs35lxx->cspl.ambient_temperature;
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
+			ret = cs35lxx_send_data_to_dsp(cs35lxx);
+		}
 
-		atomic_set(&cs35lxx->calib_monitor, 0);
+		atomic_set(&cs35lxx->cspl.calib_monitor, 0);
 	}
 }
 
 static int cs35lxx_calibration_stop(struct cs35lxx_private *cs35lxx)
 {
-	cs35lxx->calib_param.command = CSPL_CMD_STOP_CALIBRATION;
+	cs35lxx->cspl.calib_param.command = CSPL_CMD_STOP_CALIBRATION;
+	cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
 
 	return cs35lxx_send_data_to_dsp(cs35lxx);
+}
+
+static void cs35lxx_diagnostics_start(struct work_struct *wk)
+{
+	struct cs35lxx_private *cs35lxx;
+	int i;
+	int ret;
+	int try_times = CS35LXX_CSPL_HANDSHAKE_MAX_TRY_TIME;
+
+	cs35lxx = container_of(container_of(wk, struct cs35lxx_cspl, diag_work),
+						   struct cs35lxx_private, cspl);
+
+	// CSPL handshake
+	cs35lxx->cspl.cspl_ready = false;
+	while (atomic_read(&cs35lxx->cspl.diag_monitor)) {
+		for (i = 0; i < try_times; i++) {
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_DIAGNOSTICS;
+			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
+			if (ret == 0 && cs35lxx->cspl.diag_param.command == CSPL_CMD_LIBARAY_READY) {
+				dev_info(cs35lxx->dev, "CSPL is ready\n");
+				cs35lxx->cspl.cspl_ready = true;
+				break;
+			}
+			usleep_range(200000, 200100);
+		}
+
+		if ( cs35lxx->cspl.cspl_ready) {
+			cs35lxx->cspl.diag_param.command = CSPL_CMD_START_DIAGNOSTICS;
+			cs35lxx->cspl.diag_param.data.temperature = cs35lxx->cspl.ambient_temperature;
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_DIAGNOSTICS;
+			ret = cs35lxx_send_data_to_dsp(cs35lxx);
+		}
+
+		atomic_set(&cs35lxx->cspl.diag_monitor, 0);
+	}
+}
+
+static int cs35lxx_diagnostics_stop(struct cs35lxx_private *cs35lxx)
+{
+	cs35lxx->cspl.diag_param.command = CSPL_CMD_STOP_DIAGNOSTICS;
+	cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_DIAGNOSTICS;
+
+	return cs35lxx_send_data_to_dsp(cs35lxx);
+}
+
+static int cs35lxx_get_f0(struct cs35lxx_private *cs35lxx)
+{
+	int ret;
+
+	cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_DIAGNOSTICS;
+	ret = cs35lxx_receive_data_from_dsp(cs35lxx);
+	if (ret) {
+		dev_err(cs35lxx->dev, "Failed to read f0 from the DSP\n");
+		return ret;
+	}
+	if (cs35lxx->cspl.diag_param.command != CSPL_CMD_GET_F0) {
+		dev_err(cs35lxx->dev, "Command does not match\n");
+		return -EINVAL;
+	}
+
+	dev_info(cs35lxx->dev, "Read F0 struct:\n");
+	dev_info(cs35lxx->dev, "\tStatus: %d\n", cs35lxx->cspl.diag_param.data.status);
+	dev_info(cs35lxx->dev, "\tF0: 0x%x\n", cs35lxx->cspl.diag_param.data.f0);
+	dev_info(cs35lxx->dev, "\tAmbient: %d\n", cs35lxx->cspl.diag_param.data.temperature);
+
+	return ret;
 }
 
 static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 {
 	struct miscdevice *dev = f->private_data;
 	struct cs35lxx_private *cs35lxx;
-	struct cs35lxx_calib_data *calib_param;
-	int ret, val;
+	int ret = CS35LXX_IOCTL_STATUS_OK;
+	int val = 0;
+	uint32_t *r0_array;
 
 	cs35lxx = container_of(dev, struct cs35lxx_private, misc_dev);
 
@@ -1170,14 +1381,15 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 			break;
 		case CS35LXX_SPK_DSP_BYPASS:
 			if (val == 1) {
-				cs35lxx->calib_param.command = CSPL_CMD_ENABLE_DSPBYPASS;
+				cs35lxx->cspl.calib_param.command = CSPL_CMD_ENABLE_DSPBYPASS;
 			} else if (val == 0) {
-				cs35lxx->calib_param.command = CSPL_CMD_DISABLE_DSPBYPASS;
+				cs35lxx->cspl.calib_param.command = CSPL_CMD_DISABLE_DSPBYPASS;
 			} else {
 				dev_err(cs35lxx->dev, "Unsupported value %d\n", val);
 				ret = -EFAULT;
 				goto exit;
 			}
+			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
 			ret = cs35lxx_send_data_to_dsp(cs35lxx);
 			break;
 		case CS35LXX_SPK_SWITCH_CALIBRATION:
@@ -1185,7 +1397,6 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		case CS35LXX_SPK_SWITCH_CONFIGURATION:
 			break;
 		case CS35LXX_SPK_GET_R0:
-			dev_info(cs35lxx->dev, "CS35LXX_SPK_GET_R0\n");
 			ret = cs35lxx_get_calib_struct(cs35lxx);
 			if (ret) {
 				dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
@@ -1193,15 +1404,27 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 				goto exit;
 			}
 			if (copy_to_user((uint32_t *) arg,
-							 &cs35lxx->calib_param.data.rdc,
+							 &cs35lxx->cspl.calib_param.data.rdc,
 							 sizeof(uint32_t))) {
 				dev_err(cs35lxx->dev, "copy to user failed\n");
 				ret = -EFAULT;
 				goto exit;
 			}
-			ret = CS35LXX_IOCTL_STATUS_OK;
 			break;
 		case CS35LXX_SPK_GET_F0:
+			ret = cs35lxx_get_f0(cs35lxx);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to get f0 from dsp\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			if (copy_to_user((uint32_t *) arg,
+							 &cs35lxx->cspl.diag_param.data.f0,
+							 sizeof(uint32_t))) {
+				dev_err(cs35lxx->dev, "copy to user failed\n");
+				ret = -EFAULT;
+				goto exit;
+			}
 			break;
 		case CS35LXX_SPK_GET_CAL_STRUCT:
 			ret = cs35lxx_get_calib_struct(cs35lxx);
@@ -1211,7 +1434,7 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 				goto exit;
 			}
 			if (copy_to_user((struct cs35lxx_calib_data *)arg,
-							  &cs35lxx->calib_param.data,
+							  &cs35lxx->cspl.calib_param.data,
 							  sizeof(struct cs35lxx_calib_data))) {
 				dev_err(cs35lxx->dev, "copy to user failed\n");
 				ret = -EFAULT;
@@ -1219,24 +1442,24 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 			}
 			break;
 		case CS35LXX_SPK_SET_CAL_STRUCT:
-			calib_param = kmalloc(sizeof(struct cs35lxx_calib_data), GFP_KERNEL);
-			if (copy_from_user(calib_param, arg, sizeof(struct cs35lxx_calib_data))) {
+			if (copy_from_user(cs35lxx->cspl.dsp_recv_buffer, arg,
+							   sizeof(struct cs35lxx_calib_data))) {
 				dev_err(cs35lxx->dev, "copy from user failed\n");
 				ret = -EFAULT;
 				goto exit;
 			}
-			cs35lxx->calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
-			cs35lxx->calib_param.data.temperature = calib_param->temperature;
-			cs35lxx->calib_param.data.rdc = calib_param->rdc;
-			cs35lxx->calib_param.data.status = calib_param->status;
-			cs35lxx->calib_param.data.checksum = calib_param->checksum;
+			cs35lxx->cspl.calib_param.command = CSPL_CMD_SET_CALIBRATION_PARAM;
+			cs35lxx->cspl.calib_param.data.temperature = cs35lxx->cspl.dsp_recv_buffer[0];
+			cs35lxx->cspl.calib_param.data.rdc = cs35lxx->cspl.dsp_recv_buffer[1];
+			cs35lxx->cspl.calib_param.data.status = cs35lxx->cspl.dsp_recv_buffer[2];
+			cs35lxx->cspl.calib_param.data.checksum = cs35lxx->cspl.dsp_recv_buffer[3];
 
-			ret = cs35lxx_send_data_to_dsp(cs35lxx);
-			kfree(calib_param);
+			atomic_set(&cs35lxx->cspl.set_cal_struct_monitor, 1);
+			queue_work(cs35lxx->cspl.set_cal_struct_wq, &cs35lxx->cspl.set_cal_struct_work);
 			break;
 		case CS35LXX_SPK_SET_AMBIENT:
 			dev_info(cs35lxx->dev, "copy from user val = %d\n", val);
-			cs35lxx->ambient_temperature = val;
+			cs35lxx->cspl.ambient_temperature = val;
 			ret = CS35LXX_IOCTL_STATUS_OK;
 			break;
 		case CS35LXX_SPK_SET_R0:
@@ -1244,19 +1467,52 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		case CS35LXX_SPK_SWITCH_FIRMWARE:
 			break;
 		case CS35LXX_SPK_GET_R0_REALTIME:
+			ret = cs35lxx_get_r0(cs35lxx);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			ret = cs35lxx_get_calib_struct(cs35lxx);
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed to get calib struct from dsp\n");
+				ret = -EFAULT;
+				goto exit;
+			}
+			r0_array = kmalloc(sizeof(uint32_t) * 2, GFP_KERNEL);
+			r0_array[0] = cs35lxx->cspl.r0_param.data.r0;
+			r0_array[1] = cs35lxx->cspl.calib_param.data.rdc;
+			if (copy_to_user((uint32_t *) arg,
+							 r0_array,
+							 sizeof(uint32_t) * 2)) {
+				dev_err(cs35lxx->dev, "copy to user failed\n");
+				ret = -EFAULT;
+				kfree(r0_array);
+				goto exit;
+			}
+			kfree(r0_array);
 			break;
 		case CS35LXX_SPK_SET_DEFAULT_CALIB:
 			break;
 		case CS35LXX_SPK_GET_CALIB_STATE:
 			break;
 		case CS35LXX_SPK_START_CALIBRATION:
-			atomic_set(&cs35lxx->calib_monitor, 1);
-			queue_work(cs35lxx->calib_wq, &cs35lxx->calib_work);
+			atomic_set(&cs35lxx->cspl.calib_monitor, 1);
+			queue_work(cs35lxx->cspl.calib_wq, &cs35lxx->cspl.calib_work);
 			break;
 		case CS35LXX_SPK_STOP_CALIBRATION:
-			cancel_work_sync(&cs35lxx->calib_work);
-			flush_workqueue(cs35lxx->calib_wq);
+			cancel_work_sync(&cs35lxx->cspl.calib_work);
+			flush_workqueue(cs35lxx->cspl.calib_wq);
 			ret = cs35lxx_calibration_stop(cs35lxx);
+			break;
+		case CS35LXX_SPK_START_DIAGNOSTICS:
+			atomic_set(&cs35lxx->cspl.diag_monitor, 1);
+			queue_work(cs35lxx->cspl.diag_wq, &cs35lxx->cspl.diag_work);
+			break;
+		case CS35LXX_SPK_STOP_DIAGNOSTICS:
+			cancel_work_sync(&cs35lxx->cspl.diag_work);
+			flush_workqueue(cs35lxx->cspl.diag_wq);
+			ret = cs35lxx_diagnostics_stop(cs35lxx);
 			break;
 		default:
 			dev_err(cs35lxx->dev, "Invalid IOCTL, command = %d\n", cmd);
@@ -1336,6 +1592,12 @@ static long cs35lxx_compat_ioctl(struct file *f, unsigned int cmd,
 			break;
 		case CS35LXX_SPK_STOP_CALIBRATION_COMPAT:
 			cmd64 = CS35LXX_SPK_STOP_CALIBRATION;
+			break;
+		case CS35LXX_SPK_START_DIAGNOSTICS_COMPAT:
+			cmd64 = CS35LXX_SPK_START_DIAGNOSTICS;
+			break;
+		case CS35LXX_SPK_STOP_DIAGNOSTICS_COMPAT:
+			cmd64 = CS35LXX_SPK_STOP_DIAGNOSTICS;
 			break;
 		default:
 			dev_err(cs35lxx->dev, "Invalid IOCTL, command = %d\n", cmd);
@@ -1620,10 +1882,19 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 	}
 
 	// Initialise calibration work
-	cs35lxx->calib_wq = create_singlethread_workqueue("cs35lxx_calibration");
-	INIT_WORK(&cs35lxx->calib_work, cs35lxx_calibration_start);
-	cs35lxx->dsp_recv_buffer = kmalloc(sizeof(struct cs35lxx_calib_cmd), GFP_KERNEL);
-	if (!cs35lxx->dsp_recv_buffer) {
+	cs35lxx->cspl.calib_wq = create_singlethread_workqueue("cs35lxx_calibration");
+	INIT_WORK(&cs35lxx->cspl.calib_work, cs35lxx_calibration_start);
+
+	// Initialise diagnostics work
+	cs35lxx->cspl.diag_wq = create_singlethread_workqueue("cs35lxx_diagnostics");
+	INIT_WORK(&cs35lxx->cspl.diag_work, cs35lxx_diagnostics_start);
+
+	// Initialise set_cal_struct work
+	cs35lxx->cspl.set_cal_struct_wq = create_singlethread_workqueue("cs35lxx_set_cal_struct");
+	INIT_WORK(&cs35lxx->cspl.set_cal_struct_work, cs35lxx_set_cal_struct);
+
+	cs35lxx->cspl.dsp_recv_buffer = kmalloc(sizeof(struct cs35lxx_calib_cmd), GFP_KERNEL);
+	if (!cs35lxx->cspl.dsp_recv_buffer) {
 		dev_err(cs35lxx->dev, "Failed to allocate dsp recv buffer\n");
 		return -ENOMEM;
 	}
@@ -1674,8 +1945,8 @@ static int cs35lxx_i2c_remove(struct i2c_client *client)
 	if (cs35lxx->reset_gpio)
 		gpiod_set_value_cansleep(cs35lxx->reset_gpio, 0);
 
-	if (cs35lxx->dsp_recv_buffer)
-		kfree(cs35lxx->dsp_recv_buffer);
+	if (cs35lxx->cspl.dsp_recv_buffer)
+		kfree(cs35lxx->cspl.dsp_recv_buffer);
 
 	regulator_bulk_disable(cs35lxx->num_supplies, cs35lxx->supplies);
 
