@@ -28,8 +28,11 @@
 
 #include <vendor/cirrus/smartpa_kit/SmartPAKit.h>
 
-#define DEVICE_NAME "/dev/cs35l36"
+#define DEVICE_NAME "/dev/cs35lxx"
 #define DEVICE_ADDRESS "1-0040"
+
+#define CS35LXX_R0_T_UNIFORM 23
+#define CS35LXX_R0_K_COEF 0.00383
 
 cirrus::CirrusSmartPAKit* g_smartpa_inst;
 
@@ -37,7 +40,8 @@ namespace cirrus {
 
 CirrusSmartPAKit::CirrusSmartPAKit():
     mDevFd(-1),
-    mIsDSPBypass(false)
+    mIsDSPBypass(false),
+    mReValue(0)
 {
     ALOGD("%s", __func__);
 }
@@ -71,15 +75,15 @@ int CirrusSmartPAKit::calibrate(int temprature)
     ALOGD("%s", __func__);
     int ret = 0;
 
-    ret = sendIoctlCmd(CS35L36_SPK_SET_AMBIENT, &temprature);
+    ret = sendIoctlCmd(CS35LXX_SPK_SET_AMBIENT, &temprature);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_SET_AMBIENT failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_SET_AMBIENT failed (%d)", __func__, ret);
         return ret;
     }
 
-    ret = sendIoctlCmd(CS35L36_SPK_START_CALIBRATION, &ret);
+    ret = sendIoctlCmd(CS35LXX_SPK_START_CALIBRATION, &ret);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_START_CALIBRATION failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_START_CALIBRATION failed (%d)", __func__, ret);
         return ret;
     }
 
@@ -90,15 +94,26 @@ int CirrusSmartPAKit::getR0(unsigned int *r0_array)
 {
     ALOGD("%s", __func__);
     int ret = 0 ;
+    int arg[2] = {0, 0};
 
-    ret = sendIoctlCmd(CS35L36_SPK_GET_R0, &mReValue);
+    ret = sendIoctlCmd(CS35LXX_SPK_GET_R0_REALTIME, &arg);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_GET_R0 failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_GET_R0_REALTIME failed (%d)", __func__, ret);
         return ret;
     }
 
-    r0_array[0] = mReValue;
-    ALOGD("%s: Get R0 value %d (%d)", __func__, r0_array[0], mReValue);
+    ALOGD("%s: Get R0 array value:", __func__);
+	ALOGD("\tT_realtime: 0x%x\n", arg[0]);
+	ALOGD("\tRDC: 0x%x\n", arg[1]);
+
+	uint32_t t_realtime = arg[0];
+	uint32_t r0_cal = arg[1];
+	uint32_t r_realtime = (uint32_t)((t_realtime - CS35LXX_R0_T_UNIFORM ) *
+						  CS35LXX_R0_K_COEF * r0_cal + r0_cal);
+
+	ALOGD("\tr_realtime: 0x%x\n", r_realtime);
+	r0_array[0] = r_realtime;
+    ALOGD("%s: Get R0 realtime value %d (%d)", __func__, r0_array[0], r_realtime);
 
     return ret;
 }
@@ -106,15 +121,36 @@ int CirrusSmartPAKit::getR0(unsigned int *r0_array)
 int CirrusSmartPAKit::getRe(unsigned int *re_array)
 {
     ALOGD("%s", __func__);
+    int ret = 0 ;
 
-    return 0;
+    ret = sendIoctlCmd(CS35LXX_SPK_GET_R0, &mReValue);
+    if (ret < 0) {
+        ALOGE("%s: CS35LXX_SPK_GET_R0 failed (%d)", __func__, ret);
+        return ret;
+    }
+
+    re_array[0] = mReValue;
+    ALOGD("%s: Get R0 value %d (%d)", __func__, re_array[0], mReValue);
+
+    return ret;
 }
 
 int CirrusSmartPAKit::getF0(unsigned int *f0_array)
 {
     ALOGD("%s", __func__);
+    int ret = 0 ;
+    int f0 = 0;
 
-    return 0;
+    ret = sendIoctlCmd(CS35LXX_SPK_GET_F0, &f0);
+    if (ret < 0) {
+        ALOGE("%s: CS35LXX_SPK_GET_F0 failed (%d)", __func__, ret);
+        return ret;
+    }
+
+    f0_array[0] = f0;
+    ALOGD("%s: Get F0 value %d (%d)", __func__, f0_array[0], f0);
+
+    return ret;
 }
 
 void CirrusSmartPAKit::dumpReg(void)
@@ -153,9 +189,9 @@ int CirrusSmartPAKit::speakerOn(unsigned int scene)
 
     int ret = 0;
 
-    ret = sendIoctlCmd(CS35L36_SPK_POWER_ON, &scene);
+    ret = sendIoctlCmd(CS35LXX_SPK_POWER_ON, &scene);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_POWER_ON failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_POWER_ON failed (%d)", __func__, ret);
         return ret;
     }
 
@@ -168,9 +204,9 @@ int CirrusSmartPAKit::speakerOff(unsigned int scene)
 
     int ret = 0;
 
-    ret = sendIoctlCmd(CS35L36_SPK_POWER_OFF, &scene);
+    ret = sendIoctlCmd(CS35LXX_SPK_POWER_OFF, &scene);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_POWER_OFF failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_POWER_OFF failed (%d)", __func__, ret);
         return ret;
     }
 
@@ -181,29 +217,34 @@ void CirrusSmartPAKit::getCalibValue(void)
 {
     ALOGD("%s", __func__);
     int ret = 0 ;
-    struct cs35l36_calib_data calib_data;
+    struct cs35lxx_calib_data calib_data;
 
-    ret = sendIoctlCmd(CS35L36_SPK_GET_CAL_STRUCT, &calib_data);
+    ret = sendIoctlCmd(CS35LXX_SPK_GET_CAL_STRUCT, &calib_data);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_GET_CAL_STRUCT failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_GET_CAL_STRUCT failed (%d)", __func__, ret);
         return;
     }
 
     ALOGD("%s: Get calibration value:", __func__);
 	ALOGD("\tStatus: %d\n", calib_data.status);
 	ALOGD("\tRDC: 0x%x\n", calib_data.rdc);
-	ALOGD("\tAmbient: %d\n", calib_data.temp);
+	ALOGD("\tAmbient: %d\n", calib_data.temperature);
 	ALOGD("\tChecksum: 0x%x\n", calib_data.checksum);
 }
 
-void CirrusSmartPAKit::setCalibValue(void)
+void CirrusSmartPAKit::setCalibValue(void *param)
 {
     ALOGD("%s", __func__);
     int ret = 0 ;
+    struct cs35lxx_calib_data *calib_param = (struct cs35lxx_calib_data *) param;
 
-    ret = sendIoctlCmd(CS35L36_SPK_SET_CAL_STRUCT, &ret);
+    ALOGD("%s: calib_param->temperature = %d", __func__, calib_param->temperature);
+    ALOGD("%s: calib_param->rdc = %d", __func__, calib_param->rdc);
+    ALOGD("%s: calib_param->status = %d", __func__, calib_param->status);
+    ALOGD("%s: calib_param->checksum = %d", __func__, calib_param->checksum);
+    ret = sendIoctlCmd(CS35LXX_SPK_SET_CAL_STRUCT, calib_param);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_SET_CAL_STRUCT failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_SET_CAL_STRUCT failed (%d)", __func__, ret);
         return;
     }
 
@@ -215,9 +256,9 @@ void CirrusSmartPAKit::setR0(unsigned int r0)
     ALOGD("%s", __func__);
     int ret = 0 ;
 
-    ret = sendIoctlCmd(CS35L36_SPK_SET_R0, &r0);
+    ret = sendIoctlCmd(CS35LXX_SPK_SET_R0, &r0);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_SET_R0 failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_SET_R0 failed (%d)", __func__, ret);
         return;
     }
 
@@ -231,9 +272,9 @@ int CirrusSmartPAKit::getDefaultCalibState(void)
     int state = 0;
     int ret;
 
-    ret = sendIoctlCmd(CS35L36_SPK_GET_CALIB_STATE, &state);
+    ret = sendIoctlCmd(CS35LXX_SPK_GET_CALIB_STATE, &state);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_GET_CALIB_STATE failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_GET_CALIB_STATE failed (%d)", __func__, ret);
         return ret;
     }
 
@@ -246,9 +287,9 @@ void CirrusSmartPAKit::setDefaultCalibValue(int value)
 
     int ret;
 
-    ret = sendIoctlCmd(CS35L36_SPK_SET_DEFAULT_CALIB, &value);
+    ret = sendIoctlCmd(CS35LXX_SPK_SET_DEFAULT_CALIB, &value);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_SET_CALIB_STATE failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_SET_CALIB_STATE failed (%d)", __func__, ret);
         return;
     }
 
@@ -273,13 +314,41 @@ void CirrusSmartPAKit::stopCalib(void)
     ALOGD("%s", __func__);
     int ret = 0;
 
-    ret = sendIoctlCmd(CS35L36_SPK_STOP_CALIBRATION, &ret);
+    ret = sendIoctlCmd(CS35LXX_SPK_STOP_CALIBRATION, &ret);
     if (ret < 0) {
-        ALOGE("%s: CS35L36_SPK_STOP_CALIBRATION failed (%d)", __func__, ret);
+        ALOGE("%s: CS35LXX_SPK_STOP_CALIBRATION failed (%d)", __func__, ret);
         return;
     }
 
     ALOGD("%s: Stop calibration success: %d", __func__, ret);
+}
+
+void CirrusSmartPAKit::startDiag(void)
+{
+    ALOGD("%s", __func__);
+    int ret = 0;
+
+    ret = sendIoctlCmd(CS35LXX_SPK_START_DIAGNOSTICS, &ret);
+    if (ret < 0) {
+        ALOGE("%s: CS35LXX_SPK_START_DIAGNOSTICS failed (%d)", __func__, ret);
+        return;
+    }
+
+    ALOGD("%s: Start diagnostics success: %d", __func__, ret);
+}
+
+void CirrusSmartPAKit::stopDiag(void)
+{
+    ALOGD("%s", __func__);
+    int ret = 0;
+
+    ret = sendIoctlCmd(CS35LXX_SPK_STOP_DIAGNOSTICS, &ret);
+    if (ret < 0) {
+        ALOGE("%s: CS35LXX_SPK_STOP_DIAGNOSTICS failed (%d)", __func__, ret);
+        return;
+    }
+
+    ALOGD("%s: Stop diagnostics success: %d", __func__, ret);
 }
 
 void CirrusSmartPAKit::bypassDSP(bool bypass)
@@ -290,9 +359,9 @@ void CirrusSmartPAKit::bypassDSP(bool bypass)
     int val = bypass ? 1 : 0;
 
     if (mIsDSPBypass != bypass) {
-        ret =  ioctl(mDevFd, CS35L36_SPK_DSP_BYPASS, &val);
+        ret =  ioctl(mDevFd, CS35LXX_SPK_DSP_BYPASS, &val);
         if (ret < 0) {
-            ALOGE("%s: CS35L36_SPK_DSP_BYPASS failed", __func__);
+            ALOGE("%s: CS35LXX_SPK_DSP_BYPASS failed", __func__);
             return;
         }
 

@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#include <vendor/cirrus/smartpa_kit/cs35l36.h>
+#include <vendor/cirrus/smartpa_kit/cs35lxx.h>
 
 namespace cirrus {
 
@@ -50,7 +50,7 @@ public:
     int speakerOff(unsigned int scene);
 
     void getCalibValue(void);
-    void setCalibValue(void);
+    void setCalibValue(void *param);
     void setR0(unsigned int r0);
     int getDefaultCalibState(void);
     void setDefaultCalibValue(int value);
@@ -59,6 +59,8 @@ public:
     int getTemprature(int *temprature_array);
     void startCalib(void);
     void stopCalib(void);
+    void startDiag(void);
+    void stopDiag(void);
     void bypassDSP(bool bypass);
 
 private:
