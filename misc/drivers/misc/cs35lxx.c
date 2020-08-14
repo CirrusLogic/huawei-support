@@ -1114,7 +1114,8 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 	switch (cs35lxx->cspl.cspl_cmd_type) {
 		case CSPL_CMD_CALIBRATION:
-			ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->cspl.dsp_recv_buffer,
+			cs35lxx->cspl.dsp_recv_buffer[0] = CSPL_CMD_GET_CALIBRATION_PARAM;
+			ret = mtk_spk_recv_ipi_buf_from_dsp((int8_t*)cs35lxx->cspl.dsp_recv_buffer,
 												sizeof(struct cs35lxx_calib_cmd),
 												&data_length);
 			if (ret) {
@@ -1130,7 +1131,8 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 			break;
 		case CSPL_CMD_R0:
-			ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->cspl.dsp_recv_buffer,
+			cs35lxx->cspl.dsp_recv_buffer[0] = CSPL_CMD_GET_R0;
+			ret = mtk_spk_recv_ipi_buf_from_dsp((int8_t*)cs35lxx->cspl.dsp_recv_buffer,
 												sizeof(struct cs35lxx_r0_cmd),
 												&data_length);
 			if (ret) {
@@ -1143,7 +1145,8 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 			break;
 		case CSPL_CMD_DIAGNOSTICS:
-			ret = mtk_spk_recv_ipi_buf_from_dsp((uint8_t*)cs35lxx->cspl.dsp_recv_buffer,
+			cs35lxx->cspl.dsp_recv_buffer[0] = CSPL_CMD_GET_F0;
+			ret = mtk_spk_recv_ipi_buf_from_dsp((int8_t*)cs35lxx->cspl.dsp_recv_buffer,
 												sizeof(struct cs35lxx_diagnostics_cmd),
 												&data_length);
 			if (ret) {
@@ -1153,7 +1156,7 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 			cs35lxx->cspl.diag_param.command = cs35lxx->cspl.dsp_recv_buffer[0];
 			cs35lxx->cspl.diag_param.data.f0 = cs35lxx->cspl.dsp_recv_buffer[2];
-			cs35lxx->cspl.diag_param.data.status = cs35lxx->cspl.dsp_recv_buffer[2];
+			cs35lxx->cspl.diag_param.data.status = cs35lxx->cspl.dsp_recv_buffer[3];
 			break;
 		default:
 			dev_err(cs35lxx->dev, "Unsupported command\n");
