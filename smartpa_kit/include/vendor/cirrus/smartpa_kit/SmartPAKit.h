@@ -39,7 +39,7 @@ public:
     void deinit(void);
 
     // Mandatory
-    int calibrate(int temprature);
+    int calibrate(int temperature);
     int getR0(unsigned int *r0_array);
     int getRe(unsigned int *re_array);
     int getF0(unsigned int *f0_array);
@@ -57,10 +57,9 @@ public:
 
     // Optional
     int getTemprature(int *temprature_array);
-    void startCalib(void);
-    void stopCalib(void);
-    void startDiag(void);
-    void stopDiag(void);
+    int stopCalib(void);
+    int startDiag(int temperature);
+    int stopDiag(void);
     void bypassDSP(bool bypass);
 
 private:

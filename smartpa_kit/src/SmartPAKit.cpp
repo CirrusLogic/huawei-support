@@ -70,12 +70,12 @@ void CirrusSmartPAKit::deinit(void)
     mIsDSPBypass = false;
 }
 
-int CirrusSmartPAKit::calibrate(int temprature)
+int CirrusSmartPAKit::calibrate(int temperature)
 {
     ALOGD("%s", __func__);
     int ret = 0;
 
-    ret = sendIoctlCmd(CS35LXX_SPK_SET_AMBIENT, &temprature);
+    ret = sendIoctlCmd(CS35LXX_SPK_SET_AMBIENT, &temperature);
     if (ret < 0) {
         ALOGE("%s: CS35LXX_SPK_SET_AMBIENT failed (%d)", __func__, ret);
         return ret;
@@ -304,12 +304,7 @@ int CirrusSmartPAKit::getTemprature(int *temprature_array)
     return 0;
 }
 
-void CirrusSmartPAKit::startCalib(void)
-{
-    ALOGD("%s", __func__);
-}
-
-void CirrusSmartPAKit::stopCalib(void)
+int CirrusSmartPAKit::stopCalib(void)
 {
     ALOGD("%s", __func__);
     int ret = 0;
@@ -317,27 +312,35 @@ void CirrusSmartPAKit::stopCalib(void)
     ret = sendIoctlCmd(CS35LXX_SPK_STOP_CALIBRATION, &ret);
     if (ret < 0) {
         ALOGE("%s: CS35LXX_SPK_STOP_CALIBRATION failed (%d)", __func__, ret);
-        return;
+        return ret;
     }
 
     ALOGD("%s: Stop calibration success: %d", __func__, ret);
+    return ret;
 }
 
-void CirrusSmartPAKit::startDiag(void)
+int CirrusSmartPAKit::startDiag(int temperature)
 {
     ALOGD("%s", __func__);
     int ret = 0;
 
+    ret = sendIoctlCmd(CS35LXX_SPK_SET_AMBIENT, &temperature);
+    if (ret < 0) {
+        ALOGE("%s: CS35LXX_SPK_SET_AMBIENT failed (%d)", __func__, ret);
+        return ret;
+    }
+
     ret = sendIoctlCmd(CS35LXX_SPK_START_DIAGNOSTICS, &ret);
     if (ret < 0) {
         ALOGE("%s: CS35LXX_SPK_START_DIAGNOSTICS failed (%d)", __func__, ret);
-        return;
+        return ret;
     }
 
     ALOGD("%s: Start diagnostics success: %d", __func__, ret);
+    return ret;
 }
 
-void CirrusSmartPAKit::stopDiag(void)
+int CirrusSmartPAKit::stopDiag(void)
 {
     ALOGD("%s", __func__);
     int ret = 0;
@@ -345,10 +348,11 @@ void CirrusSmartPAKit::stopDiag(void)
     ret = sendIoctlCmd(CS35LXX_SPK_STOP_DIAGNOSTICS, &ret);
     if (ret < 0) {
         ALOGE("%s: CS35LXX_SPK_STOP_DIAGNOSTICS failed (%d)", __func__, ret);
-        return;
+        return ret;
     }
 
     ALOGD("%s: Stop diagnostics success: %d", __func__, ret);
+    return ret;
 }
 
 void CirrusSmartPAKit::bypassDSP(bool bypass)
