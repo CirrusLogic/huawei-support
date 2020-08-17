@@ -1114,7 +1114,6 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 	switch (cs35lxx->cspl.cspl_cmd_type) {
 		case CSPL_CMD_CALIBRATION:
-			cs35lxx->cspl.dsp_recv_buffer[0] = CSPL_CMD_GET_CALIBRATION_PARAM;
 			ret = mtk_spk_recv_ipi_buf_from_dsp((int8_t*)cs35lxx->cspl.dsp_recv_buffer,
 												sizeof(struct cs35lxx_calib_cmd),
 												&data_length);
@@ -1131,7 +1130,6 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 			break;
 		case CSPL_CMD_R0:
-			cs35lxx->cspl.dsp_recv_buffer[0] = CSPL_CMD_GET_R0;
 			ret = mtk_spk_recv_ipi_buf_from_dsp((int8_t*)cs35lxx->cspl.dsp_recv_buffer,
 												sizeof(struct cs35lxx_r0_cmd),
 												&data_length);
@@ -1145,7 +1143,6 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 
 			break;
 		case CSPL_CMD_DIAGNOSTICS:
-			cs35lxx->cspl.dsp_recv_buffer[0] = CSPL_CMD_GET_F0;
 			ret = mtk_spk_recv_ipi_buf_from_dsp((int8_t*)cs35lxx->cspl.dsp_recv_buffer,
 												sizeof(struct cs35lxx_diagnostics_cmd),
 												&data_length);
@@ -1202,9 +1199,8 @@ static void cs35lxx_set_cal_struct(struct work_struct *wk)
 						   struct cs35lxx_private, cspl);
 
 	// CSPL handshake
-	cs35lxx->cspl.cspl_ready = false;
 	while (atomic_read(&cs35lxx->cspl.set_cal_struct_monitor)) {
-		for (i = 0; i < try_times; i++) {
+		for (i = 0; i < try_times && (!cs35lxx->cspl.cspl_ready); i++) {
 			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
 			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
 			if (ret == 0 && cs35lxx->cspl.calib_param.command == CSPL_CMD_LIBARAY_READY) {
@@ -1257,9 +1253,8 @@ static void cs35lxx_calibration_start(struct work_struct *wk)
 						   struct cs35lxx_private, cspl);
 
 	// CSPL handshake
-	cs35lxx->cspl.cspl_ready = false;
 	while (atomic_read(&cs35lxx->cspl.calib_monitor)) {
-		for (i = 0; i < try_times; i++) {
+		for (i = 0; i < try_times && (!cs35lxx->cspl.cspl_ready); i++) {
 			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_CALIBRATION;
 			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
 			if (ret == 0 && cs35lxx->cspl.calib_param.command == CSPL_CMD_LIBARAY_READY) {
@@ -1300,9 +1295,8 @@ static void cs35lxx_diagnostics_start(struct work_struct *wk)
 						   struct cs35lxx_private, cspl);
 
 	// CSPL handshake
-	cs35lxx->cspl.cspl_ready = false;
 	while (atomic_read(&cs35lxx->cspl.diag_monitor)) {
-		for (i = 0; i < try_times; i++) {
+		for (i = 0; i < try_times && (!cs35lxx->cspl.cspl_ready); i++) {
 			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_DIAGNOSTICS;
 			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
 			if (ret == 0 && cs35lxx->cspl.diag_param.command == CSPL_CMD_LIBARAY_READY) {
@@ -1381,6 +1375,7 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 			break;
 		case CS35LXX_SPK_POWER_OFF:
 			ret = cs35lxx_spk_power_off(cs35lxx);
+			cs35lxx->cspl.cspl_ready = false;
 			break;
 		case CS35LXX_SPK_DSP_BYPASS:
 			if (val == 1) {
