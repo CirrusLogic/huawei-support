@@ -1,38 +1,23 @@
 
-Release Note:
+Release Note: Release v1.0.0 - RC1
 
- - hwcfg and mt6853-params from the lates official Aurisys(Official)_ALPS W1.2020.01, dowloaded from MTK's exchange.
- - [MTK RELEASE][Cirrus]ALPS-MP-Q0.MP2-V1.55.PRE.B_K6853V1_64_PRE.md5 ALPS-MP-Q0.MP2-V1.55.PRE.B_K6853V1_64_PRE_INHOUSE
- - folder content :
-.
-├ adsp
-│   ├ adsp_default_build
-│   │   ├ audio_dsp-default-build-with-xtensa.img
-│   │   └ audio_dsp-default.img
-│   ├ android_full_build
-│   │   ├ audio_dsp.img
-│   │   └ audio_dsp-verified.img
-│   ├ cirrus
-│   │   ├ bypass
-│   │   │   └ audio_dsp.img
-│   │   └ process
-│   │       └ audio_dsp.img
-│   └ README
-├ android
-│   ├ config
-│   │   ├ aurisys_config_hifi3.xml <--- NOTE: some changes, needs to be updated on device
-│   │   └ aurisys_config.xml
-│   ├ cspl_parser
-│   │   ├ lib
-│   │   │   └ libcspl_parser.so   <--- NOTE: Changed, update on device
-│   │   └ lib64
-│   │       └ libcspl_parser.so	  <--- NOTE: Changed, update on device
-│   └ parameters
-│       └ vendor
-│           └ etc
-│               └ cirrus
-│                   ├ cspl_param_clb.bin  <--- NEW parameter (calibration)
-│                   └ cspl_param_plb.bin  <--- NEW parameter (acoustic tuning)
-└ README
+    Based on the latest MTK SDK -  ALPS-MP-Q0.MP2-V1.55.PRE
+    Based on the latest documentation of Aurisys(Official)_ALPS W1.2020.01
+    MTK Aurisys framework API version has been reverted to V1.4 ( latest MTK SDK still using V1.4 )
+    Implements CSPL integration layer for MTK Aurisys framework on AP and DSP sides
+    Implements mandatory MTK's API verification test harness
+    Implements downlink test harness with playback/calibration/diagnostics use cases
+    Supports 24-bit enhancement + protect signal chain,  mono.
+    Support for 16bit signal chains and stereo mode has been removed as customer HW has only support for 24bit mono mode
+    Supports calibration use case
+    Supports diagnostics use case
+    Supports set/get calibration parameters
+    Supports get T_realtime
+    Support dynamically loadable signal chains
+    Support dynamically loadable calibration parameters
+    V/Imon feedback support via downlink reference buffer
+    No bit exactness test implemented yet due to aggressive release dates.
+    Tested with Xtensa simulator and customer HW.
+
 
 
