@@ -69,6 +69,7 @@ struct cs35lxx_cspl {
 	struct cs35lxx_calib_cmd calib_param;
 	struct cs35lxx_r0_cmd r0_param;
 	struct cs35lxx_diagnostics_cmd diag_param;
+	struct cs35lxx_set_scene_cmd   scene_param;
 	uint32_t *dsp_recv_buffer;
 	uint32_t ambient_temperature;
 	bool cspl_ready;
@@ -1076,6 +1077,26 @@ static int cs35lxx_send_data_to_dsp(struct cs35lxx_private *cs35lxx)
 	uint32_t *dsp_send_buffer;
 
 	switch (cs35lxx->cspl.cspl_cmd_type) {
+		case CSPL_CMD_SCENE:
+			dsp_send_buffer = kmalloc(sizeof(struct cs35lxx_set_scene_cmd), GFP_KERNEL);
+			if (!dsp_send_buffer) {
+				dev_err(cs35lxx->dev, "Failed to allocate memory for buffer\n");
+				return -ENOMEM;
+			}
+
+			dsp_send_buffer[0] = cs35lxx->cspl.scene_param.command;
+			dsp_send_buffer[1] = cs35lxx->cspl.scene_param.data.scene;
+			dsp_send_buffer[2] = cs35lxx->cspl.scene_param.data.empty1;
+			dsp_send_buffer[3] = cs35lxx->cspl.scene_param.data.empty2;
+			dsp_send_buffer[4] = cs35lxx->cspl.scene_param.data.empty3;
+
+			ret = mtk_spk_send_ipi_buf_to_dsp(dsp_send_buffer,
+											  (sizeof(struct cs35lxx_set_scene_cmd)));
+			if (ret) {
+				dev_err(cs35lxx->dev, "Failed send buffer to the DSP %d\n", ret);
+				goto exit;
+			}
+			break;
 		case CSPL_CMD_CALIBRATION:
 			dsp_send_buffer = kmalloc(sizeof(struct cs35lxx_calib_cmd), GFP_KERNEL);
 			if (!dsp_send_buffer) {
@@ -1240,7 +1261,16 @@ static void cs35lxx_set_cal_struct(struct work_struct *wk)
 			cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_HAND_SHAKE;
 			ret = cs35lxx_receive_data_from_dsp(cs35lxx);
 			if (ret == 0 && cs35lxx->cspl.calib_param.command == CSPL_CMD_LIBARAY_READY) {
-				dev_info(cs35lxx->dev, "CSPL is ready\n");
+				dev_info(cs35lxx->dev, "CSPL is ready, set tuning to %d, \n",
+							cs35lxx->cspl.scene_param.data.scene);
+				//CSPL defult tuning is "MUSIC" when aurisys manager created
+				//here CSPL is ready, load the tuning before set cal_struct
+				if(cs35lxx->cspl.scene_param.data.scene != MUSIC) {
+					cs35lxx->cspl.scene_param.command = CSPL_CMD_SET_SCENE;
+					cs35lxx->cspl.cspl_cmd_type = CSPL_CMD_SCENE;
+					ret = cs35lxx_send_data_to_dsp(cs35lxx);
+					usleep_range(10000, 10100);
+				}
 				cs35lxx->cspl.cspl_ready = true;
 				break;
 			}
@@ -1453,6 +1483,7 @@ static long cs35lxx_ioctl(struct file *f, unsigned int cmd, void __user *arg)
 		case CS35LXX_SPK_POWER_ON:
 			dev_info(cs35lxx->dev, "CS35LXX_SPK_POWER_ON\n");
 			ret = cs35lxx_spk_power_on(cs35lxx);
+			cs35lxx->cspl.scene_param.data.scene = val;
 			break;
 		case CS35LXX_SPK_POWER_OFF:
 			dev_info(cs35lxx->dev, "CS35LXX_SPK_POWER_OFF\n");

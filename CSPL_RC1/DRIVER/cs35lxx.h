@@ -511,6 +511,36 @@ extern const int cs35lxx_a0_pac_patch[CS35LXX_PAC_PROG_MEM];
 								_IOWR(CS35LXX_MAGIC_NUMBER, 20, compat_uptr_t)
 #endif
 
+//compatible with smartpa_kit defined scene
+enum smartpa_scene {
+	MUSIC = 0,
+	RINGTONE,
+	RINGTONE_HS_SPK,
+	VOICE,
+	VOIP,
+	LOWPOWER,
+	MMI_PRI_L,
+	ALGO_BYPASS,//implemented by bypass cmd, no need support in tuning
+	LOW_TEMP,
+	CALIB,//implement by calibration cmd, no need support in tuning
+	FM,
+	SMARTPA_SCENE_MAX,
+};
+
+//for smartpa tuning choose
+struct cs35lxx_scene_param {
+	int32_t scene;
+	int32_t empty1;
+	int32_t empty2;
+	int32_t empty3;
+};
+
+struct cs35lxx_set_scene_cmd {
+	uint32_t command;
+	struct cs35lxx_scene_param data;
+};
+
+
 // Structs for Aurisys API
 struct cs35lxx_calib_data {
 	int32_t temperature;
@@ -552,7 +582,8 @@ enum cs35lxx_cspl_cmd_type {
 	CSPL_CMD_HAND_SHAKE     = 0,
 	CSPL_CMD_CALIBRATION	= 1,
 	CSPL_CMD_DIAGNOSTICS	= 2,
-	CSPL_CMD_R0				= 3
+	CSPL_CMD_R0				= 3,
+	CSPL_CMD_SCENE          = 4,
 };
 
 
@@ -567,6 +598,7 @@ enum cs35lxx_cspl_arsi_command {
 	CSPL_CMD_ENABLE_DSPBYPASS		= 2027,
 	CSPL_CMD_DISABLE_DSPBYPASS		= 2028,
 	CSPL_CMD_GET_R0					= 2029,
-	CSPL_CMD_GET_F0					= 2030
+	CSPL_CMD_GET_F0					= 2030,
+	CSPL_CMD_SET_SCENE	            = 2031,
 };
 #endif /* __CS35LXX_H */
