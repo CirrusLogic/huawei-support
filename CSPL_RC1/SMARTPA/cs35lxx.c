@@ -16,8 +16,6 @@
 #define TEMP_MULTIPLE 65536
 #define FW_NAME_SIZE   50
 #define FW_NAME_BASE  "/vendor/firmware/cs35lxx"
-#define RE_DEFAULT     9790//7 OHM (Range 5-9)
-#define F0_DEFAULT     1118907//800HZ(Range 400-1200)
 
 
 static int dev_node_fd = -1;
@@ -78,7 +76,12 @@ int cs35lxx_init(void)
     ret = rmt_oeminfo_read(OEMINFO_AUDIO_SMARTPA_CALIBRATION,
                                (unsigned int)sizeof(calib_oeminfo_t),
                                (unsigned char *)calib_oeminfo_cs);
-    
+    if ((ret < 0) || (calib_oeminfo_cs->calibration_value_f[0] < MIN_CAL_Z) ||
+				(calib_oeminfo_cs->calibration_value_f[0] > MAX_CAL_Z)) {
+				ALOGE("%s: rmt_oeminfo_read calibration failed or value invalid, set it to default", __FUNCTION__);
+				calib_oeminfo_cs->calibration_value[0] = RE_DEFAULT;
+				calib_oeminfo_cs->calibration_value_f[0] = Z_TO_OHM(RE_DEFAULT);
+    }   
     //ret = ioctl(dev_node_fd, SMARTPA_SPK_SWITCH_FIRMWARE, &g_box_vendor);
     //if (ret < 0) {
     //        ALOGE("%s: SMARTPA_SPK_SWITCH_FIRMWARE failed", __FUNCTION__);
@@ -95,6 +98,7 @@ void cs35lxx_deinit(void)
         close (dev_node_fd);
     dev_node_fd = -1;
     free(calib_oeminfo_cs);
+    calib_oeminfo_cs = NULL;
 }
 void cs35lxx_reg_dump(void)
 {

@@ -346,12 +346,12 @@ static int smartpa_parser_coef_range(char *product_name, double *coef_range)
     int i;
     (void)product_name;
     for(i = 0; i < 4; i++) {
-        coef_range[i * 6 + 0] = 5;
-        coef_range[i * 6 + 1] = 9;
+        coef_range[i * 6 + 0] = MIN_CAL_Z;
+        coef_range[i * 6 + 1] = MAX_CAL_Z;
         coef_range[i * 6 + 2] = 0;
         coef_range[i * 6 + 3] = 0;
-        coef_range[i * 6 + 4] = 400;
-        coef_range[i * 6 + 5] = 1200;
+        coef_range[i * 6 + 4] = MIN_F0;
+        coef_range[i * 6 + 5] = MAX_F0;
     }    
     return 0;
 }

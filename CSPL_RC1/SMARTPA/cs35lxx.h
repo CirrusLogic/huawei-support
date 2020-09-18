@@ -58,6 +58,13 @@
 #define CS35LXX_R0_T_UNIFORM 23
 #define CS35LXX_R0_K_COEF 0.00383
 
+#define Z_TO_OHM(z) ((z) * 5.85714 / 8192.0)
+#define MIN_CAL_Z 5
+#define MAX_CAL_Z 9
+#define MIN_F0 400
+#define MAX_F0 1200
+#define RE_DEFAULT     9790//7 OHM (Range 5-9)
+#define F0_DEFAULT     1118907//800HZ(Range 400-1200)
 
 enum smartpa_scene {
 	MUSIC = 0,
