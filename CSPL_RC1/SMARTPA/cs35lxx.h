@@ -96,6 +96,7 @@ void cs35lxx_reg_dump(void);
 int cs35lxx_speaker_on(unsigned int scene);
 int cs35lxx_speaker_off(unsigned int scene);
 int cs35lxx_get_re(unsigned int *re_array);
+int cs35lxx_get_temp(int *temp_array);
 int cs35lxx_get_r0(unsigned int *r0_array);
 int cs35lxx_get_f0(unsigned int *f0_array);
 void cs35lxx_dsp_bypass(bool enable);

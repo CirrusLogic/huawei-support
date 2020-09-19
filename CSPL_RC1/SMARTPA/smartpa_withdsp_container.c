@@ -305,6 +305,13 @@ static int smartpa_get_re(unsigned int *re_array)
     return cs35lxx_get_re(re_array);
 }
 
+static int smartpa_get_temperature(int *temp_array)
+{
+    if (temp_array == NULL)
+            return -1;
+    return cs35lxx_get_temp(temp_array);
+}
+
 static int smartpa_get_f0(unsigned int *f0_array)
 {
     if (f0_array == NULL)
@@ -377,7 +384,8 @@ int smartpa_lib_open(struct smartpa_with_dsp_lib *dsp_lib)
     dsp_lib->smartpa_calib_stop = smartpa_calib_stop;
     dsp_lib->smartpa_with_dsp_algp_bypass = smartpa_algo_bypass;
     dsp_lib->smartpa_set_calib_value = smartpa_set_calib_value;
-    
+    dsp_lib->smartpa_get_temperature = smartpa_get_temperature;
+
     ALOGD("%s: end succ", __FUNCTION__);
     return 0;
 }

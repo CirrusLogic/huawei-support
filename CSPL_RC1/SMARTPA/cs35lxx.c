@@ -233,6 +233,23 @@ int cs35lxx_get_re(unsigned int *re_array)
     return 0;    
 }
 
+int cs35lxx_get_temp(int *temp_array)
+{
+    ALOGD("%s: enter", __FUNCTION__);
+    int ret = 0 ;
+    int t_realtime = 0;
+    ret = ioctl(dev_node_fd, SMARTPA_SPK_GET_R0_REALTIME, &t_realtime);
+    if (ret < 0) {
+        ALOGE("%s: SMARTPA_SPK_GET_R0_REALTIME failed (%d)", __func__, ret);
+        return ret;
+    }
+
+    ALOGD("\tT_realtime: 0x%x = %d(format) C degree\n", t_realtime, t_realtime/pow(2, 22));
+    temp_array[0] = t_realtime/pow(2, 22);
+
+    return ret;
+}
+
 int cs35lxx_get_r0(unsigned int *r0_array)
 {
     ALOGD("%s: enter", __FUNCTION__);
