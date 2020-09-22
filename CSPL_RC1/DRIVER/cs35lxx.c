@@ -1195,7 +1195,7 @@ static int cs35lxx_receive_data_from_dsp(struct cs35lxx_private *cs35lxx)
 			}
 
 			cs35lxx->cspl.r0_param.command = cs35lxx->cspl.dsp_recv_buffer[0];
-			cs35lxx->cspl.r0_param.data.r0 = cs35lxx->cspl.dsp_recv_buffer[1];
+			cs35lxx->cspl.r0_param.data.r0 = cs35lxx->cspl.dsp_recv_buffer[2];
 
 			break;
 		case CSPL_CMD_DIAGNOSTICS:
