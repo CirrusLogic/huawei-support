@@ -17,7 +17,6 @@
 #define FW_NAME_SIZE   50
 #define FW_NAME_BASE  "/vendor/firmware/cs35lxx"
 
-
 static int dev_node_fd = -1;
 static unsigned int g_re_value;
 static unsigned int g_box_vendor;
@@ -238,14 +237,15 @@ int cs35lxx_get_temp(int *temp_array)
     ALOGD("%s: enter", __FUNCTION__);
     int ret = 0 ;
     int t_realtime = 0;
+    int t_temp_format = 0;
     ret = ioctl(dev_node_fd, SMARTPA_SPK_GET_R0_REALTIME, &t_realtime);
     if (ret < 0) {
         ALOGE("%s: SMARTPA_SPK_GET_R0_REALTIME failed (%d)", __func__, ret);
         return ret;
     }
-
-    ALOGD("\tT_realtime: 0x%x = %d(format) C degree\n", t_realtime, t_realtime/pow(2, 22));
-    temp_array[0] = t_realtime/pow(2, 22);
+    t_temp_format = t_realtime >> 6;
+    ALOGD("\t get T_realtime: 0x%x = %d C degree (formated)\n", t_realtime, t_temp_format);
+    temp_array[0] = t_temp_format;
 
     return ret;
 }
@@ -258,20 +258,21 @@ int cs35lxx_get_r0(unsigned int *r0_array)
     //r0_array[0] = (unsigned int)(re * TEMP_MULTIPLE);
     int ret = 0 ;
     unsigned int t_realtime = 0;
+    int t_temp_format = 0;
 	uint32_t r0_cal = 0;
     ret = ioctl(dev_node_fd, SMARTPA_SPK_GET_R0_REALTIME, &t_realtime);
     if (ret < 0) {
         ALOGE("%s: SMARTPA_SPK_GET_R0_REALTIME failed (%d)", __func__, ret);
         return ret;
     }
-
+    t_temp_format = t_realtime >> 22;
 	ALOGD("%s: Get R0 array value:", __func__);
-	ALOGD("\tT_realtime: 0x%x = %d(format)\n", t_realtime, t_realtime/pow(2, 22));
+	ALOGD("\tT_realtime: 0x%x = %d(format)\n", t_realtime, t_temp_format);
 	if (calib_oeminfo_cs->calibration_value[0] > 0)
 		r0_cal = calib_oeminfo_cs->calibration_value[0];
 	else
 		r0_cal = RE_DEFAULT;
-	uint32_t r_realtime = (uint32_t)((t_realtime/pow(2, 22) - CS35LXX_R0_T_UNIFORM ) *
+	uint32_t r_realtime = (uint32_t)((t_temp_format - CS35LXX_R0_T_UNIFORM) *
 					  CS35LXX_R0_K_COEF * r0_cal + r0_cal);
 
 	ALOGD("\tr_realtime: 0x%x\n", r_realtime);
