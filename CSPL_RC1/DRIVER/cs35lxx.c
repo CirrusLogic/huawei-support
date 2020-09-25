@@ -1975,6 +1975,8 @@ static int cs35lxx_i2c_probe(struct i2c_client *i2c_client,
 			break;
 	}
 
+	mutex_init(&cs35lxx->lock);
+
 	if (pdata->vpbr_config.is_present)
 		cs35lxx_apply_vpbr_config(cs35lxx);
 
