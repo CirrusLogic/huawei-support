@@ -1,0 +1,37 @@
+Artifact Info:
+Artifact           : CS35L36A Haptics Processing Algorithm Library 0.2.0
+Test Target MCU SDK: STM32Cube_FW_F7: 1.15.1
+Target toolchain   : GNU Arm Embedded Toolchain: arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 8-2019-q3-update) 8.3.1 20190703 (release) [gcc-8-branch revision 273027]
+Build system       : make: GNU Make 4.2.1
+OS                 : Windows: 10
+Shell              : MSYS2: msys2-runtime 3.0.7-2
+Host toolchain     : MinGW GCC: gcc (Rev2, Built by MSYS2 project) 8.3.0
+Repo Git SHA       : 253893f51c47bd1dacfeba6ba1ce33567b9c3091
+
+System resources:
+Library TEXT    : 10262 bytes
+Library BSS     : 4656 bytes
+Library DATA    : 40 bytes
+
+Compiler flags:
+    -mthumb
+    -mcpu=cortex-m7
+    -mfloat-abi=hard
+    -mfpu=fpv5-d16
+    -gdwarf-2
+    -mlong-calls
+    -D__CORTEX_M7=1
+    -D__CMSIS_RTOS=1
+    -DARMCM7_DP
+    -D__FPU_PRESENT=1
+    -D__STRICT_ANSI__
+    -Wall
+    -Werror
+    -Wno-strict-aliasing
+    -Wno-endif-labels
+    -fno-common
+    -ffunction-sections
+    -Os
+    
+
+

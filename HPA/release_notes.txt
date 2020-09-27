@@ -1,0 +1,35 @@
+Cirrus Logic CS35L36A Haptics Processing Algorithm Library
+Release Notes
+
+=============================================================================
+Summary:
+This is the release ofHaptics Processing Algorithm Library v0.2.0
+Date: 2020/09/27
+
+Library binary:
+build/Algorithms/HPA/Algorithm/libhpa.a
+
+Library API headers:
+Algorithms/HPA/Api/Include/cl_driver_algo_api.h
+Algorithms/HPA/Api/Include/cl_playback_api.h
+Algorithms/HPA/Algorithm/Math_Lib/Include/cl_types.h
+
+Exapmle Project Source:
+Algorithms/HPA/Harness/cm7_system_test/haptic_tables.h
+Algorithms/HPA/Harness/cm7_system_test/haptic_tables.c
+Algorithms/HPA/Harness/cm7_system_test/main.c
+Algorithms/HPA/Harness/cm7_system_test/makefile
+Algorithms/HPA/Harness/cm7_system_test/system_test_bsp.c
+Algorithms/HPA/Harness/cm7_system_test/system_test_bsp.h
+
+Architectures/Compilers Used:
+GNU Arm Embedded Toolchain: arm-none-eabi-gcc -mcpu=cortex-m7
+
+New Features/Changes:
+Calibration
+Waveform playback with Click Compensation and Dynamic F0
+
+Fixed Bugs:
+None
+
+=============================================================================
