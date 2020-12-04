@@ -1,37 +1,52 @@
 Artifact Info:
-Artifact           : CS35L36A Haptics Processing Algorithm Library 0.2.0
+Artifact           : CS35L36A Haptics Processing Algorithm Library 1.0.0
 Test Target MCU SDK: STM32Cube_FW_F7: 1.15.1
 Target toolchain   : GNU Arm Embedded Toolchain: arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 8-2019-q3-update) 8.3.1 20190703 (release) [gcc-8-branch revision 273027]
 Build system       : make: GNU Make 4.2.1
 OS                 : Windows: 10
 Shell              : MSYS2: msys2-runtime 3.0.7-2
 Host toolchain     : MinGW GCC: gcc (Rev2, Built by MSYS2 project) 8.3.0
-Repo Git SHA       : 253893f51c47bd1dacfeba6ba1ce33567b9c3091
-
-System resources:
-Library TEXT    : 10262 bytes
-Library BSS     : 4656 bytes
-Library DATA    : 40 bytes
+Repo Git SHA       : 7289cbcbd3483bc5f8f37d7cc65f683e6288c9c2
 
 Compiler flags:
-    -mthumb
-    -mcpu=cortex-m7
-    -mfloat-abi=hard
-    -mfpu=fpv5-d16
-    -gdwarf-2
-    -mlong-calls
-    -D__CORTEX_M7=1
-    -D__CMSIS_RTOS=1
-    -DARMCM7_DP
-    -D__FPU_PRESENT=1
-    -D__STRICT_ANSI__
-    -Wall
-    -Werror
-    -Wno-strict-aliasing
-    -Wno-endif-labels
-    -fno-common
-    -ffunction-sections
-    -Os
-    
+    -mthumb 
+    -mcpu=cortex-m7 
+    -mfloat-abi=hard 
+    -mfpu=fpv5-d16 
+    -gdwarf-2 
+    -mlong-calls  
+    -D__CORTEX_M7=1 
+    -D__CMSIS_RTOS=1 
+    -DARMCM7_DP 
+    -D__FPU_PRESENT=1 
+    -D__STRICT_ANSI__ 
+    -Wall 
+    -Werror 
+    -Wno-strict-aliasing 
+    -Wno-endif-labels 
+    -fno-common 
+    -ffunction-sections   
+    -Os 
 
+Required memory resources:
+Library TEXT    : 14222 bytes
+Library BSS     : 0 bytes
+Library DATA    : 4 bytes
+Library HEAP    : 5936 bytes (output from cs_get_cfg_size)
+Total           : 20162 bytes
 
+Required MCPS:
+
+For Mode 0 Calibration, calculations are:
+peak_cal_cycles = cs_set_mode_max_cycles + (2 * cs_play_effect_cal_max_cycles) + cs_get_calibration_max_cycles
+total_cal_mcps =  (peak_cal_cycles + (248 * cs_play_effect_cal_max_cycles)) / 1e6
+
+For Mode 1/2/3, calculations are:
+peak_playback_cycles = cs_set_mode_max_cycles + cs_set_volume_max_cycles + cs_set_effect_wave_max_cycles + cs_convert_effect_wave_max_cycles + (2 * cs_play_effect_max_cycles)
+total_playback_mcps = (peak_playback_cycles + (248 * cs_play_effect_max_cycles)) / 1e6
+
+Mode:   peak cycles per single 4ms block    total MCPS
+Mode0   119266                              14.894114
+Mode1   23895                               2.973855
+Mode2   31313                               3.901105
+Mode3   44441                               5.534169
