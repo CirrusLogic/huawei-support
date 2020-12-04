@@ -3,6 +3,27 @@ Release Notes
 
 =============================================================================
 Summary:
+This is the release of Haptics Processing Algorithm Library v1.0.1
+Date: 2020/12/03
+
+Library binary:
+hpa.o
+
+Library API header:
+hpa.h
+
+Architectures/Compilers Used:
+GNU Arm Embedded Toolchain: arm-none-eabi-gcc -mcpu=cortex-m7
+
+New Features/Changes:
+None
+
+Fixed Bugs:
+[SQA-2002] Fixed VI data endianness problem for cs_play_effect_i
+
+=============================================================================
+=============================================================================
+Summary:
 This is the release of Haptics Processing Algorithm Library v1.0.0
 Date: 2020/11/05
 
