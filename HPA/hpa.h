@@ -159,9 +159,9 @@ int32_t cs_get_cfg_size(void);
  * (Mode 1, 2, 3), f0/re/q are calibrated values.  Please note the fixed point formats for each of the LRA parameters.
  *
  * @param [in] cfg              Pointer to the heap
- * @param [in] f0               Nominal or Calibrated LRA F0 in Q9.22 format
- * @param [in] re               Nominal or Calibrated LRA ReDC in Q6.25 format
- * @param [in] q                Nominal or Calibrated LRA Q in Q7.24 format
+ * @param [in] f0               Nominal or Calibrated LRA F0 in Q13.18 format.  Must be in range [50 Hz, 511 Hz]
+ * @param [in] re               Nominal or Calibrated LRA ReDC in Q15.16 format
+ * @param [in] q                Nominal or Calibrated LRA Q in Q15.16 format
  *
  * @return
  * - HPA_RET_FAIL               if pointer to heap is NULL
@@ -276,7 +276,7 @@ int32_t cs_play_effect_i(int32_t size, int32_t *vi_in, int16_t *wave_out);
 /*
  * Get the Mode 2 Dynamic F0 measurement
  *
- * @param [out] f0              Mode 2 Dynamic F0 in Q9.22 format
+ * @param [out] f0              Mode 2 Dynamic F0 in Q13.18 format
  *
  * @return
  * - HPA_RET_FAIL               if pointer is NULL
@@ -288,9 +288,9 @@ int32_t cs_get_f0(int32_t *f0);
 /*
  * Get the Mode 0 Calibration parameters
  *
- * @param [out] f0              Mode 0 Calibration F0 in Q9.22 format
- * @param [out] re              Mode 0 Calibration ReDC in Q6.25 format
- * @param [out] q               Mode 0 Calibration Q in Q7.24 format
+ * @param [out] f0              Mode 0 Calibration F0 in Q13.18 format
+ * @param [out] re              Mode 0 Calibration ReDC in Q15.16 format
+ * @param [out] q               Mode 0 Calibration Q in Q15.16 format
  *
  * @return
  * - HPA_RET_FAIL               if any pointer is NULL

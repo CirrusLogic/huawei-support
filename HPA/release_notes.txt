@@ -3,6 +3,28 @@ Release Notes
 
 =============================================================================
 Summary:
+This is the release of Haptics Processing Algorithm Library v1.1.0
+Date: 2020/12/07
+
+Library binary:
+hpa.o
+
+Library API header:
+hpa.h
+
+Architectures/Compilers Used:
+GNU Arm Embedded Toolchain: arm-none-eabi-gcc -mcpu=cortex-m7
+
+New Features/Changes:
+[SQA-2005] Update F0, Q, ReDC format to API
+[FC-1670] Update Mode 3 sample format
+
+Fixed Bugs:
+None
+
+=============================================================================
+=============================================================================
+Summary:
 This is the release of Haptics Processing Algorithm Library v1.0.1
 Date: 2020/12/03
 
