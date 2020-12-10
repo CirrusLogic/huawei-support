@@ -1,1 +1,1 @@
-# Published files for Product Support
+# Published files for CS42L42
