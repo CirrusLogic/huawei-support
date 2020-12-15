@@ -3,6 +3,31 @@ Release Notes
 
 =============================================================================
 Summary:
+This is the release of Haptics Processing Algorithm Library v1.3.0
+Date: 2020/12/14
+
+Library binary:
+hpa.o
+
+Library API header:
+hpa.h
+
+Architectures/Compilers Used:
+GNU Arm Embedded Toolchain: arm-none-eabi-gcc -mcpu=cortex-m7
+
+New Features/Changes:
+F0 Traking module integrated for Mode1 and Mode2
+
+Fixed Bugs:
+Fixed F0/ReDC/Q format for cs_algo_init, cs_get_f0, cs_get_calibration
+Fixed Mode2 cs_set_tone_time calcuation error
+Fixed cs_set_volume scaling for 10V
+Fixed Mode2 scaling of Overdrive/Braking relative to tone
+Mode3 interpolation now always starts at 0
+
+=============================================================================
+=============================================================================
+Summary:
 This is the release of Haptics Processing Algorithm Library v1.1.0
 Date: 2020/12/07
 

@@ -1,12 +1,12 @@
 Artifact Info:
-Artifact           : CS35L36A Haptics Processing Algorithm Library 1.1.0
+Artifact           : CS35L36A Haptics Processing Algorithm Library 1.3.0
 Test Target MCU SDK: STM32Cube_FW_F7: 1.15.1
 Target toolchain   : GNU Arm Embedded Toolchain: arm-none-eabi-gcc (GNU Tools for Arm Embedded Processors 8-2019-q3-update) 8.3.1 20190703 (release) [gcc-8-branch revision 273027]
 Build system       : make: GNU Make 4.2.1
 OS                 : Windows: 10
 Shell              : MSYS2: msys2-runtime 3.0.7-2
 Host toolchain     : MinGW GCC: gcc (Rev2, Built by MSYS2 project) 8.3.0
-Repo Git SHA       : 804cd5cc872ce5826e7a332c55796e3beb142227
+Repo Git SHA       : 3e2b7f74500507a2ef1eb648dbb044f893fa2906
 
 Compiler flags:
     -mthumb 
@@ -29,11 +29,11 @@ Compiler flags:
     -Os 
 
 Required memory resources:
-Library TEXT    : 14328 bytes
-Library BSS     : 0 bytes
-Library DATA    : 4 bytes
-Library HEAP    : 5936 bytes (output from cs_get_cfg_size)
-Total           : 20268 bytes
+Library TEXT    : 27652 bytes
+Library BSS     : 9664 bytes
+Library DATA    : 152 bytes
+Library HEAP    : 5944 bytes (output from cs_get_cfg_size)
+Total           : 43412 bytes
 
 Required MCPS:
 
@@ -46,7 +46,7 @@ peak_playback_cycles = cs_set_mode_max_cycles + cs_set_volume_max_cycles + cs_se
 total_playback_mcps = (peak_playback_cycles + (248 * cs_play_effect_max_cycles)) / 1e6
 
 Mode:   peak cycles per single 4ms block    total MCPS
-Mode0   121782                              15.211094
-Mode1   25466                               3.170106
-Mode2   32770                               4.084594
-Mode3   44945                               5.588985
+Mode0   131864                              16.471344
+Mode1   188969                              23.593473
+Mode2   193387                              24.159859
+Mode3   37774                               4.68951
