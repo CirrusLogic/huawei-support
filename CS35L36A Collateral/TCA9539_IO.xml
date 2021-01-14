@@ -1,0 +1,1130 @@
+<?xml version="1.0"?>
+<!--============================================================================
+==
+== Copyright (c) Wolfson Microelectronics plc.  All rights reserved.
+==
+== This software as well as any related documentation is furnished under
+== license and may only be used or copied in accordance with the terms of the
+== license. The information in this file is furnished for informational use
+== only, is subject to change without notice, and should not be construed as
+== a commitment by Wolfson Microelectronics plc. Wolfson Microelectronics plc
+== assumes no responsibility or liability for any errors or inaccuracies that
+== may appear in this document or any software that may be provided in
+== association with this document.
+==
+== Except as permitted by such license, no part of this document may be
+== reproduced, stored in a retrieval system, or transmitted in any form or by
+== any means without the express written consent of Wolfson Microelectronics plc.
+==
+== @file   U:\_PROJECTS\6277 - WM5110+8281 (Florida)\Speaker Protection\8281+CS35L33 (Cirrus) - M5\CS35L33_RegMap_RevA.xml
+== @brief  Device description for CS35L33
+==
+== Created by WISCE utility at 16:09:59 on 2014-09-29
+==
+== @version \$Id$
+==
+== @warning
+==   This software is specifically written for Wolfson devices. It may not be
+==   used with other devices.
+==
+=============================================================================
+-->
+<WMDevice version="1001A">
+    <!--
+      ==============================================================================
+      ==  The DeviceInfo node.  This contains the basic information about the device.
+      -->
+    <DeviceInfo>
+        <DeviceID>TCA9539_IO</DeviceID>
+        <DeviceRevision>A</DeviceRevision>
+        <FileRevision>0.1</FileRevision>
+        <SourceCodeRevision>$LastChangedRevision: 0 $</SourceCodeRevision>
+        <RegisterBits>8</RegisterBits>
+        <ConfigCount>0</ConfigCount>
+        <ControlInterfaces>
+            <TwoWire>
+                <InterfaceProtocol>SMbus_8_bit_data</InterfaceProtocol>
+                <DeviceAddress>0xE8</DeviceAddress>
+			<DeviceAddress>0xEC</DeviceAddress>
+            </TwoWire>
+        </ControlInterfaces>
+    </DeviceInfo>
+    <!--
+      ==============================================================================
+      ==  The Registers node.  This contains the information about all the registers.
+      -->
+    <Registers>
+        <!-- 
+          ==  Register 0 (00h)
+          -->
+        <Register>
+            <Address>0x00</Address>
+            <Name>Input Port 0</Name>
+            <Default format="hex">0x00</Default>
+            <Access>
+                <Read/>
+                <Write/>
+            </Access>
+            <BitField top="7" width="1">
+                <Name>IO.7</Name>
+                <Default format="hex">0x0</Default>
+                <FieldType>
+                    <BitField/>
+                </FieldType>
+                <Access>
+                    <Read/>
+                    <Write/>
+                </Access>
+                <Reset>
+                    <POR/>
+                </Reset>
+                <Key/>
+            </BitField>
+          <BitField top="6" width="1">
+            <Name>IO.6</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          <BitField top="5" width="1">
+            <Name>IO.5</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          <BitField top="4" width="1">
+            <Name>IO.4</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          <BitField top="3" width="1">
+            <Name>IO.3</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          <BitField top="2" width="1">
+            <Name>IO.2</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          <BitField top="1" width="1">
+            <Name>IO.1</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          <BitField top="0" width="1">
+            <Name>IO.0</Name>
+            <Default format="hex">0x0</Default>
+            <FieldType>
+              <BitField/>
+            </FieldType>
+            <Access>
+              <Read/>
+              <Write/>
+            </Access>
+            <Reset>
+              <POR/>
+            </Reset>
+            <Key/>
+          </BitField>
+          </Register>
+
+      <!--
+          ==  Register 1 (01h)
+          -->
+      <Register>
+        <Address>0x01</Address>
+        <Name>Input Port 1</Name>
+        <Default format="hex">0x00</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>I1.7</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>I1.6</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>I1.5</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>I1.4</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>I1.3</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>I1.2</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>I1.1</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>I1.0</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+      </Register>
+
+      <!--
+          ==  Register 2 (02h)
+          -->
+      <Register>
+        <Address>0x02</Address>
+        <Name>Output Port 0</Name>
+        <Default format="hex">0xFF</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>O0.7</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>O0.6</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>O0.5</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>O0.4</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>O0.3</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>O0.2</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>O0.1</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>O0.0</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+      </Register>
+      
+
+
+      <!--
+          ==  Register 03 (03h)
+          -->
+
+      <Register>
+        <Address>0x03</Address>
+        <Name>Output Port 1</Name>
+        <Default format="hex">0xFF</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>O1.7</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>O1.6</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>O1.5</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>O1.4</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>O1.3</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>O1.2</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>O1.1</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>O1.0</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+      </Register>
+
+      <!--
+          ==  Register 04 (04h)
+          -->
+      <Register>
+        <Address>0x04</Address>
+        <Name>Polarity Inversion 0</Name>
+        <Default format="hex">0x00</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>N0.7</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>N0.6</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>N0.5</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>N0.4</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>N0.3</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>N0.2</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>N0.1</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>N0.0</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+      </Register>
+
+      <!--
+          ==  Register 05 (05h)
+          -->
+      <Register>
+        <Address>0x05</Address>
+        <Name>Polarity Inversion 1</Name>
+        <Default format="hex">0x00</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>N1.7</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>N1.6</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>N1.5</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>N1.4</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>N1.3</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>N1.2</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>N1.1</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>N1.0</Name>
+          <Default format="hex">0x0</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+       </Register>
+
+
+      <!--
+          ==  Register 06 (06h)
+          -->
+
+      <Register>
+        <Address>0x06</Address>
+        <Name>Configuration 0</Name>
+        <Default format="hex">0xFF</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>C0.7</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>C0.6</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>C0.5</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>C0.4</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>C0.3</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>C0.2</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>C0.1</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>C0.0</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+      </Register>
+
+
+
+
+      <!--
+          ==  Register 07 (07h)
+          -->
+
+      <Register>
+        <Address>0x07</Address>
+        <Name>Configuration 1</Name>
+        <Default format="hex">0xFF</Default>
+        <Access>
+          <Read/>
+          <Write/>
+        </Access>
+        <BitField top="7" width="1">
+          <Name>C1.7</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="6" width="1">
+          <Name>C1.6</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="5" width="1">
+          <Name>C1.5</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="4" width="1">
+          <Name>C1.4</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="3" width="1">
+          <Name>C1.3</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="2" width="1">
+          <Name>C1.2</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="1" width="1">
+          <Name>C1.1</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+        <BitField top="0" width="1">
+          <Name>C1.0</Name>
+          <Default format="hex">0x1</Default>
+          <FieldType>
+            <BitField/>
+          </FieldType>
+          <Access>
+            <Read/>
+            <Write/>
+          </Access>
+          <Reset>
+            <POR/>
+          </Reset>
+          <Key/>
+        </BitField>
+      </Register>
+      </Registers>
+</WMDevice>
