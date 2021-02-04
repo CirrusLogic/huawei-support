@@ -6,4 +6,30 @@ Cmd  : patch < patch_cirrus.patch
 
 Will patch patch_cirrus.c and add support for Cirrus Logic CS8409/CS42L42 codecs
 
+===============================================================
+04/02/2021 - Update
+===============================================================
+
+Fixed SND_PCI_QUIRK tables, should now fix dummy outputs issue.
+
+!!!!!! NOTE !!!!!!
+
+If you are patching clean kernel, then please do:
+
+File :  patch_cirrus-04-02-21.patch
+Path : ./sound/pci/hda
+Cmd  : patch < patch_cirrus-04-02-21.patch
+
+If you already have previous patch in place, then, please, use delta patch:
+
+File :  patch_cirrus-fix-001.patch
+Path : ./sound/pci/hda
+Cmd  : patch < patch_cirrus-fix-001.patch
+
+Full sound/pci/hds source with latest patch also updated:
+
+File: patch_cirrus.tar.gz 
+
+
+
 

@@ -1,0 +1,73 @@
+--- ./pub/linux-5.10.7/sound/pci/hda/patch_cirrus.c	2021-02-03 16:40:17.647735515 +0000
++++ ./linux-5.10.7/sound/pci/hda/patch_cirrus.c	2021-02-04 18:41:46.034730587 +0000
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
+ #include <sound/core.h>
+ #include <linux/mutex.h>
++#include <linux/pci.h>
+ #include <sound/tlv.h>
+ #include <sound/hda_codec.h>
+ #include "hda_local.h"
+@@ -1270,10 +1271,47 @@
+  * It works on UPXtreme development board
+  * */
+ static const struct snd_pci_quirk cs8409_fixup_tbl[] = {
+-	SND_PCI_QUIRK(0x1013, 0x8409, "Dell Bullseye", DELL_BULLSEYE),
+-	SND_PCI_QUIRK(0x1013, 0x8409, "Dell Warlock", DELL_WARLOCK),
+-	SND_PCI_QUIRK(0x1013, 0x8409, "Dell Cyborg", DELL_CYBORG),
++	/* Known Bulleseye models from INF file */
++	SND_PCI_QUIRK(0x1028, 0x0A11, "Bullseye V3 14 AMD", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A12, "Bullseye N3 15 AMD", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A23, "Bullseye V3 14 TGL", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A24, "Bullseye V3 15 TGL", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A25, "Bullseye N3 15 TGL", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A29, "Bullseye V3 14 ICL", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A2A, "Bullseye V3 15 ICL", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x0A2B, "Bullseye N3 15 ICL", DELL_BULLSEYE),
++	/* Subvendor, Subdevice */
++	SND_PCI_QUIRK(0x1013, 0x8409, "Dell Bullseye GN", DELL_BULLSEYE),
++	SND_PCI_QUIRK(0x1028, 0x8409, "Dell Bullseye GN", DELL_BULLSEYE),
++	/* Known Warlock models from INF file */
++	SND_PCI_QUIRK(0x1028, 0x0AB0, "Warlock N3 15 TGL", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0AB2, "Warlock V3 15 TGL", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0AB1, "Warlock N3 15 ICL", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0AB3, "Warlock V3 15 ICL", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0AB4, "Warlock N3 15 AMD", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0AB5, "Warlock V3 15 AMD", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0AD9, "Warlock N3 15 TGL-U", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0ADA, "Warlock N3 15 ICL-U", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0ADB, "Warlock V3 15 TGL-U", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x0ADC, "Warlock V3 15 ICL-U", DELL_WARLOCK),
++	/* Subvendor Subdevice */
++	SND_PCI_QUIRK(0x1013, 0x8409, "Dell Warlock GN", DELL_WARLOCK),
++	SND_PCI_QUIRK(0x1028, 0x8409, "Dell Warlock GN", DELL_WARLOCK),
++	/* Known Cyborg models from INF file */
++	SND_PCI_QUIRK(0x1028, 0x0A77, "Cyborg N 14 AMD", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A78, "Cyborg N 15 AMD", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A79, "Cyborg V 14 AMD", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A7A, "Cyborg V 15 AMD", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A7D, "Cyborg N 14 TGL", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A7E, "Cyborg N 15 TGL", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A7F, "Cyborg V 14 TGL", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x0A80, "Cyborg V 15 TGL", DELL_CYBORG),
++	/* Subvendor Subdevice */
++	SND_PCI_QUIRK(0x1013, 0x8409, "Dell Cyborg GN", DELL_CYBORG),
++	SND_PCI_QUIRK(0x1028, 0x8409, "Dell Cyborg GN", DELL_CYBORG),
++	/* UPXtreme development board */
+ 	SND_PCI_QUIRK(0x1013, 0x8409, "UPXtreme", UPXTREME_CDB42L42),
++	SND_PCI_QUIRK_VENDOR(0x1028, "Dell", DELL_BULLSEYE),
+ 	{} /* terminator */
+ };
+ 
+@@ -2112,6 +2150,11 @@
+ 
+ 	snd_hda_add_verbs(codec, cs8409_verbs);
+ 
++	codec_info(codec, "Vendor = %08x, id = %08x, subid=%08x\n",
++			codec->bus->pci->subsystem_vendor,
++			codec->bus->pci->subsystem_device,
++			codec->core.subsystem_id);
++
+ 	snd_hda_pick_fixup(codec, cs8409_models, cs8409_fixup_tbl,
+ 			   cs8409_fixups);
+ 
