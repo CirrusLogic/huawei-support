@@ -1,6 +1,6 @@
 diff -Naur ./sound/pci/hda/hda_auto_parser.h ../../linux/sound/pci/hda/hda_auto_parser.h
---- ./sound/pci/hda/hda_auto_parser.h	2021-01-12 19:18:27.000000000 +0000
-+++ ../../linux/sound/pci/hda/hda_auto_parser.h	2021-02-22 13:40:03.140635864 +0000
+--- ./sound/pci/hda/hda_auto_parser.h	2021-02-24 18:35:58.943818725 +0000
++++ ../../linux/sound/pci/hda/hda_auto_parser.h	2021-02-24 18:07:35.684005998 +0000
 @@ -27,7 +27,7 @@
  };
  
@@ -10,9 +10,31 @@ diff -Naur ./sound/pci/hda/hda_auto_parser.h ../../linux/sound/pci/hda/hda_auto_
  
  struct auto_pin_cfg_item {
  	hda_nid_t pin;
+diff -Naur ./sound/pci/hda/hda_codec.c ../../linux/sound/pci/hda/hda_codec.c
+--- ./sound/pci/hda/hda_codec.c	2021-01-12 19:18:27.000000000 +0000
++++ ../../linux/sound/pci/hda/hda_codec.c	2021-02-24 18:32:37.908038736 +0000
+@@ -4,6 +4,7 @@
+  *
+  * Copyright (c) 2004 Takashi Iwai <tiwai@suse.de>
+  */
++#define DEBUG 1
+ 
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff -Naur ./sound/pci/hda/hda_generic.c ../../linux/sound/pci/hda/hda_generic.c
+--- ./sound/pci/hda/hda_generic.c	2021-01-12 19:18:27.000000000 +0000
++++ ../../linux/sound/pci/hda/hda_generic.c	2021-02-24 18:32:37.900038819 +0000
+@@ -6,6 +6,7 @@
+  *
+  * Copyright (c) 2004 Takashi Iwai <tiwai@suse.de>
+  */
++#define DEBUG 1
+ 
+ #include <linux/init.h>
+ #include <linux/slab.h>
 diff -Naur ./sound/pci/hda/hda_local.h ../../linux/sound/pci/hda/hda_local.h
---- ./sound/pci/hda/hda_local.h	2021-01-12 19:18:27.000000000 +0000
-+++ ../../linux/sound/pci/hda/hda_local.h	2021-02-22 13:40:03.140635864 +0000
+--- ./sound/pci/hda/hda_local.h	2021-02-24 18:35:58.943818725 +0000
++++ ../../linux/sound/pci/hda/hda_local.h	2021-02-24 18:07:35.684005998 +0000
 @@ -180,7 +180,7 @@
  /*
   * input MUX helper
@@ -23,8 +45,8 @@ diff -Naur ./sound/pci/hda/hda_local.h ../../linux/sound/pci/hda/hda_local.h
  	char label[32];
  	unsigned int index;
 diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus.c
---- ./sound/pci/hda/patch_cirrus.c	2021-01-12 19:18:27.000000000 +0000
-+++ ../../linux/sound/pci/hda/patch_cirrus.c	2021-02-22 22:39:35.739266342 +0000
+--- ./sound/pci/hda/patch_cirrus.c	2021-02-24 18:35:58.943818725 +0000
++++ ../../linux/sound/pci/hda/patch_cirrus.c	2021-02-24 18:31:52.856678705 +0000
 @@ -4,11 +4,14 @@
   *
   * Copyright (c) 2009 Takashi Iwai <tiwai@suse.de>
@@ -58,7 +80,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
  };
  
  /* available models with CS420x */
-@@ -1219,6 +1233,1039 @@
+@@ -1219,6 +1233,1006 @@
  	return err;
  }
  
@@ -66,12 +88,14 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 + * companion chip CS42L42 */
 +
 +#define CS8409_VENDOR_NID 0x47
++
 +#define DEBUG_CS24L42_I2C
 +
 +#define CS8409_CS42L42_HP_PIN_NID	0x24
 +#define CS8409_CS42L42_SPK_PIN_NID	0x2c
 +#define CS8409_CS42L42_AMIC_PIN_NID	0x34
 +#define CS8409_CS42L42_DMIC_PIN_NID	0x44
++#define CS8409_CS42L42_DMIC_ADC_PIN_NID	0x22
 +
 +static struct mutex cs8409_i2c_mux;
 +
@@ -201,7 +225,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +	{ 0x47, AC_VERB_SET_COEF_INDEX, 0x0002 },     /* Configure GPIO 6,7 */
 +	{ 0x47, AC_VERB_SET_PROC_COEF,  0x0080 },     /* I2C mode */
 +	{ 0x47, AC_VERB_SET_COEF_INDEX, 0x005b },     /* Set I2C bus speed */
-+	{ 0x47, AC_VERB_SET_PROC_COEF,  0x0000 },     /* 100kHz */
++	{ 0x47, AC_VERB_SET_PROC_COEF,  0x0200 },     /* 100kHz I2C_STO = 2 */
 +	{} /* terminator */
 +};
 +
@@ -310,6 +334,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +	{ 0x1C03, 0xC0 },
 +	{ 0x1105, 0x00 },
 +	{ 0x1112, 0xC0 },
++	{ 0x1101, 0x02 },
 +	{} /* Terminator */
 +};
 +
@@ -404,12 +429,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +
 +	} while(repeat);
 +
-+	if( repeat == 0) {
-+		codec_err(codec, "%s() i2c transaction failed\n", __func__);
-+		return -1;
-+	}
-+
-+	return 0;
++	return repeat > 0 ? 0 : -1;
 +}
 +
 +/* CS8409 slave i2cRead */
@@ -426,12 +446,19 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +
 +	if (paged) {
 +		cs_vendor_coef_set(codec, CIR_I2C_QWRITE, i2c_reg >> 8);
-+		cs8409_i2c_wait_complete(codec);
++		if (cs8409_i2c_wait_complete(codec) == -1) {
++			codec_err(codec,
++				"%s() Paged Transaction Failed 0x%02x : 0x%04x = 0x%02x\n",
++				__func__, i2c_address, i2c_reg, retval);
++		}
 +	}
 +
 +	i2c_reg_data = (i2c_reg << 8) & 0x0ffff;
 +	cs_vendor_coef_set(codec, CIR_I2C_QREAD, i2c_reg_data);
-+	cs8409_i2c_wait_complete(codec);
++	if (cs8409_i2c_wait_complete(codec) == -1) {
++		codec_err(codec,"%s() Transaction Failed 0x%02x : 0x%04x = 0x%02x\n",
++			__func__, i2c_address, i2c_reg, retval);
++	}
 +
 +	/* Register in bits 15-8 and the data in 7-0 */
 +	retval = cs_vendor_coef_get(codec, CIR_I2C_QREAD);
@@ -460,13 +487,21 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +
 +	if (paged) {
 +		cs_vendor_coef_set(codec, CIR_I2C_QWRITE, i2c_reg >> 8);
-+		cs8409_i2c_wait_complete(codec);
++		if (cs8409_i2c_wait_complete(codec) == -1) {
++			codec_err(codec,
++				"%s() Paged Transaction Failed 0x%02x : 0x%04x = 0x%02x\n",
++				__func__, i2c_address, i2c_reg, retval);
++		}
 +	}
 +
 +	i2c_reg_data = ((i2c_reg << 8) & 0x0ff00) | (i2c_data & 0x0ff);
 +	cs_vendor_coef_set(codec, CIR_I2C_QWRITE, i2c_reg_data);
 +
-+	cs8409_i2c_wait_complete(codec);
++	if (cs8409_i2c_wait_complete(codec) == -1) {
++		codec_err(codec,"%s() Transaction Failed 0x%02x : 0x%04x = 0x%02x\n",
++			__func__, i2c_address, i2c_reg, retval);
++	}
++
 +	cs8409_enable_i2c_clock(codec, 0);
 +
 +#ifdef DEBUG_CS24L42_I2C
@@ -592,8 +627,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +
 +	return;
 +}
-+
-+static void cs8409_cs42l42_init(struct hda_codec *codec,
++static void cs8409_cs42l42_init_seq(struct hda_codec *codec,
 +		const struct cs8409_i2c_param* seq)
 +{
 +	codec_dbg(codec, "%s()\n", __func__);
@@ -619,6 +653,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +	unsigned int reg_hs_status = 0;
 +	unsigned int reg_ts_status = 0;
 +	int type = 0;
++	struct hda_jack_tbl *jk;
 +
 +	codec_dbg(codec, "%s() gpio4=%08x\n",
 +			__func__, (res & (1 << 4)));
@@ -704,14 +739,19 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +		snd_hda_set_pin_ctl(codec, CS8409_CS42L42_SPK_PIN_NID,
 +				(spec->cs42l42_hp_jack_in)?0 : PIN_OUT);
 +
-+		snd_hda_set_pin_ctl(codec, CS8409_CS42L42_DMIC_PIN_NID,
-+				(spec->cs42l42_mic_jack_in)?0 : PIN_IN);
++		/* Report jack*/
++		jk = snd_hda_jack_tbl_get_mst(codec, CS8409_CS42L42_HP_PIN_NID, 0);
++		if(jk) {
++			snd_hda_jack_unsol_event(codec,
++				(jk->tag << AC_UNSOL_RES_TAG_SHIFT) & AC_UNSOL_RES_TAG);
++		}
 +
-+
++		jk = snd_hda_jack_tbl_get_mst(codec, CS8409_CS42L42_AMIC_PIN_NID, 0);
++		if(jk) {
++			snd_hda_jack_unsol_event(codec,
++				(jk->tag << AC_UNSOL_RES_TAG_SHIFT) & AC_UNSOL_RES_TAG);
++		}
 +	}
-+
-+	snd_hda_jack_set_dirty_all(codec);
-+	snd_hda_jack_poll_all(codec);
 +
 +	usleep_range(1000,1500);
 +
@@ -749,124 +789,71 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +static int cs8409_suspend(struct hda_codec *codec)
 +{
 +	codec_dbg(codec, "%s()\n", __func__);
++	codec_dbg(codec, "Power down ASP/EQ/MIX/HP\n");
++
++	mutex_lock(&cs8409_i2c_mux);
++	/* Power down CS42L42 ASP/EQ/MIX/HP */
++	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x1101, 0xfe,1);
++	mutex_unlock(&cs8409_i2c_mux);
 +	snd_hda_shutup_pins(codec);
 +	return 0;
 +}
 +#endif
 +
++static void cs8409_cs42l42_cap_sync_hook(struct hda_codec *codec,
++					 struct snd_kcontrol *kcontrol,
++					 struct snd_ctl_elem_value *ucontrol)
++{
++	struct cs_spec *spec = codec->spec;
++	unsigned int curval, expval;
++	/* CS8409 DMIC Pin only allows the setting of the Stream Parameters in
++	 * Power State D0. When a headset is unplugged, and the path is switched to
++	 * the DMIC, the Stream is restarted with the new ADC, but this is done in
++	 * Power State D3. Restart the Stream now DMIC is in D0. */
++	if (spec->gen.cur_adc == CS8409_CS42L42_DMIC_ADC_PIN_NID) {
++		curval = snd_hda_codec_read(codec, spec->gen.cur_adc,
++			0, AC_VERB_GET_CONV, 0);
++		expval = (spec->gen.cur_adc_stream_tag << 4) | 0;
++		if (curval != expval) {
++			codec_dbg(codec, "%s Restarting Stream after DMIC switch\n", __func__);
++			__snd_hda_codec_cleanup_stream(codec, spec->gen.cur_adc, 1);
++			snd_hda_codec_setup_stream(codec, spec->gen.cur_adc,
++					   spec->gen.cur_adc_stream_tag, 0,
++					   spec->gen.cur_adc_format);
++		}
++    }
++	return;
++}
++
++static int cs8409_cs42l42_init(struct hda_codec *codec)
++{
++	int ret;
++	codec_dbg(codec, "%s()\n", __func__);
++
++	ret = snd_hda_gen_init(codec);
++
++	if (!ret) {
++		/* Power up ASP/EQ/MIX/HP */
++		codec_dbg(codec, "Power up ASP/EQ/MIX/HP\n");
++
++		mutex_lock(&cs8409_i2c_mux);
++		cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x1101, 0x02,1);
++		mutex_unlock(&cs8409_i2c_mux);
++	}
++
++	return ret;
++}
++
 +static const struct hda_codec_ops cs8409_cs42l42_patch_ops = {
 +	.build_controls = cs8409_cs42l42_build_controls,
 +	.build_pcms = snd_hda_gen_build_pcms,
-+	.init = snd_hda_gen_init,
++	.init = cs8409_cs42l42_init,
 +	.free = cs_free,
 +	.unsol_event = cs8409_jack_unsol_event,
 +#ifdef CONFIG_PM
 +	.suspend = cs8409_suspend,
 +#endif
 +};
-+
-+static void cs8409_cs42l42_power_up(struct hda_codec *codec)
-+{
-+	codec_dbg(codec, "%s()\n", __func__);
-+
-+	/* Power up ASP/EQ/MIX/HP */
-+	codec_dbg(codec, "Power up ASP/EQ/MIX/HP\n");
-+
-+	mutex_lock(&cs8409_i2c_mux);
-+	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x1101, 0x02,1);
-+	/* MIXER_CHA_VOL=00h (0 dB) */
-+	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x2301, 0x00,1);
-+	/* MIXER_CHB_VOL=00h (0 dB) */
-+	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x2303, 0x00,1);
-+	/* MIXER_ADC_VOL=00h (0 dB) */
-+	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x2302, 0x00,1);
-+
-+	mutex_unlock(&cs8409_i2c_mux);
-+
-+	return;
-+}
-+
-+static void cs8409_cs42l42_power_down(struct hda_codec *codec)
-+{
-+	codec_dbg(codec, "%s()\n", __func__);
-+	codec_dbg(codec, "Power down ASP/EQ/MIX/HP\n");
-+
-+	mutex_lock(&cs8409_i2c_mux);
-+	/* MIXER_ADC_VOL=3Fh (mute) */
-+	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x2302, 0x3f,1);
-+	/* Power down CS42L42 ASP/EQ/MIX/HP */
-+	cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x1101, 0xfe,1);
-+
-+	mutex_unlock(&cs8409_i2c_mux);
-+
-+	return;
-+}
-+
-+static void cs8409_cs42l42_playback_pcm_hook(struct hda_pcm_stream *hinfo,
-+				   struct hda_codec *codec,
-+				   struct snd_pcm_substream *substream,
-+				   int action)
-+{
-+	struct cs_spec *spec = codec->spec;
-+
-+	codec_dbg(codec, "%s() action=%d, nid=%04x (0)\n",
-+			__func__,  action, hinfo->nid);
-+
-+	switch(action) {
-+
-+	case HDA_GEN_PCM_ACT_PREPARE:
-+		codec_dbg(codec, "%s(), %08x\n", __func__, spec->gen.active_streams);
-+		spec->pcm_playback = 1;
-+		if(!spec->pcm_capture)
-+			cs8409_cs42l42_power_up(codec);
-+		break;
-+
-+	case HDA_GEN_PCM_ACT_CLEANUP:
-+		codec_dbg(codec, "%s(), %08x\n", __func__, spec->gen.active_streams);
-+		spec->pcm_playback = 0;
-+		if(!spec->pcm_capture)
-+			cs8409_cs42l42_power_down(codec);
-+		break;
-+
-+	default:
-+		break;
-+
-+	}
-+
-+	return;
-+}
-+
-+static void cs8409_cs42l42_capture_pcm_hook(struct hda_pcm_stream *hinfo,
-+				  struct hda_codec *codec,
-+				  struct snd_pcm_substream *substream,
-+				  int action)
-+{
-+	struct cs_spec *spec = codec->spec;
-+
-+	codec_dbg(codec, "%s() action=%d, nid=%04x\n",
-+			__func__,  action, hinfo->nid);
-+
-+	switch(action) {
-+
-+		case HDA_GEN_PCM_ACT_PREPARE:
-+			codec_dbg(codec, "%s(), %08x\n", __func__, spec->gen.active_streams);
-+			spec->pcm_capture = 1;
-+			if(!spec->pcm_playback)
-+				cs8409_cs42l42_power_up(codec);
-+			break;
-+
-+		case HDA_GEN_PCM_ACT_CLEANUP:
-+			codec_dbg(codec, "%s(), %08x\n", __func__, spec->gen.active_streams);
-+			spec->pcm_capture = 0;
-+			if(!spec->pcm_playback)
-+				cs8409_cs42l42_power_down(codec);
-+			break;
-+
-+		default:
-+			break;
-+	}
-+	return;
-+}
 +
 +/* Enable/Disable Unsolicited Response for gpio(s) 3,4 */
 +static void cs8409_enable_UR(struct hda_codec *codec, int flag)
@@ -904,15 +891,17 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +	cs8409_cs42l42_reset(codec);
 +
 +	/* Initialise CS42L42 companion codec */
-+	cs8409_cs42l42_init(codec, cs42l42_init_reg_seq);
++	cs8409_cs42l42_init_seq(codec, cs42l42_init_reg_seq);
 +
 +	/* Required only for UPXTREME/CDB42L42 board */
 +	if(codec->fixup_id == CS8409_UPXTREME) {
 +		cs8409_tas5825_init(codec);
 +		/* On CDB42L42 board TIP_SENSE is inverted */
++		mutex_lock(&cs8409_i2c_mux);
 +		reg = cs8409_i2c_read(codec, CS42L42_I2C_ADDR, 0x1b73, 1);
 +		reg |= 0x0020;
 +		reg = cs8409_i2c_write(codec, CS42L42_I2C_ADDR, 0x1b73, reg, 1);
++		mutex_unlock(&cs8409_i2c_mux);
 +	}
 +	cs8409_cs42l42_enable_jack_detect(codec);
 +
@@ -920,7 +909,6 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +	cs8409_enable_UR(codec, 1);
 +
 +	return 1;
-+
 +}
 +
 +static int cs8409_cs42l42_fixup(struct hda_codec *codec,
@@ -1000,7 +988,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +	addr = ((cmd >> 28) & 0x0f);
 +	nid = ((cmd >> 20) & 0x07f);
 +	verb = ((cmd >> 8) & 0x0fff);
-+	param = (cmd & 0x0ff);
++	param = (cmd & 0x0ffff);
 +
 +	switch(nid) {
 +	case CS8409_CS42L42_HP_PIN_NID:
@@ -1061,8 +1049,9 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
 +
 +		codec->patch_ops = cs8409_cs42l42_patch_ops;
 +
-+		spec->gen.pcm_playback_hook = cs8409_cs42l42_playback_pcm_hook;
-+		spec->gen.pcm_capture_hook = cs8409_cs42l42_capture_pcm_hook;
++		// spec->gen.pcm_playback_hook = cs8409_cs42l42_playback_pcm_hook;
++		// spec->gen.pcm_capture_hook = cs8409_cs42l42_capture_pcm_hook;
++		spec->gen.cap_sync_hook = cs8409_cs42l42_cap_sync_hook;
 +
 +		spec->gen.suppress_auto_mute = 1;
 +		spec->gen.no_primary_hp = 1;
@@ -1098,7 +1087,7 @@ diff -Naur ./sound/pci/hda/patch_cirrus.c ../../linux/sound/pci/hda/patch_cirrus
  
  /*
   * patch entries
-@@ -1229,6 +2276,7 @@
+@@ -1229,6 +2243,7 @@
  	HDA_CODEC_ENTRY(0x10134208, "CS4208", patch_cs4208),
  	HDA_CODEC_ENTRY(0x10134210, "CS4210", patch_cs4210),
  	HDA_CODEC_ENTRY(0x10134213, "CS4213", patch_cs4213),
