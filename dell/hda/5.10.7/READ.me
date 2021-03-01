@@ -1,8 +1,14 @@
 Patch for Linux kernel 5.10.7
 
-File :  patch_cirrus_26-Fe0b-2021.patch
+File : cirrus_patch_01_03_2021.tar.gz 
 
-This patch will reset and initialize cs8409 and cs42l42 on resume.
+This is series of patches adding support for CS8409/CS42L42 codec.
+Please unpack into your linux root directory and apply via git.
+
+> tar xvf cirrus_patch_01_03_2021.tar.gz 
+> git am *.patch
+
+This series of patches is a candidate for upstream submission.
 
 NOTE: You will need to set default sample rate for pulseaudio:
 file: /etc/pulse/daemon.conf
