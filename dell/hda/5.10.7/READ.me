@@ -1,21 +1,16 @@
 Patch for Linux kernel 5.10.7
 
-File : cirrus_patch_01_03_2021.tar.gz 
+File : patch_cirrus.tar.gz 
 
 This is series of patches adding support for CS8409/CS42L42 codec.
-Please unpack into your linux root directory and apply via git.
 
-> tar xvf cirrus_patch_01_03_2021.tar.gz 
-> git am *.patch
-
-This series of patches is a candidate for upstream submission.
+This series of patches is upstream version. 
+https://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound.git
 
 NOTE: You will need to set default sample rate for pulseaudio:
 file: /etc/pulse/daemon.conf
 default-sample-rate = 48000
 
-Full sound/pci/hds source with latest patch also updated:
-File: patch_cirrus.src.tar.gz 
 
 
 
