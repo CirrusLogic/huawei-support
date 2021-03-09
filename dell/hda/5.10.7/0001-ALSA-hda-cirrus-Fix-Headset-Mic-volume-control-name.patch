@@ -1,0 +1,27 @@
+From 39169f5887cb513185ad8c8e494522c6430841de Mon Sep 17 00:00:00 2001
+From: Stefan Binding <sbinding@opensource.cirrus.com>
+Date: Tue, 9 Mar 2021 10:34:02 +0000
+Subject: [PATCH] ALSA: hda/cirrus: Fix Headset Mic volume control name
+
+Signed-off-by: Stefan Binding <sbinding@opensource.cirrus.com>
+Change-Id: I49c31897d124893d56aa23d9fd44ee77c2afdb72
+---
+ sound/pci/hda/patch_cirrus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/pci/hda/patch_cirrus.c b/sound/pci/hda/patch_cirrus.c
+index 6a9e5c803977..5e938ab2bde3 100644
+--- a/sound/pci/hda/patch_cirrus.c
++++ b/sound/pci/hda/patch_cirrus.c
+@@ -1740,7 +1740,7 @@ static const struct snd_kcontrol_new cs8409_cs42l42_hp_volume_mixer = {
+ static const struct snd_kcontrol_new cs8409_cs42l42_amic_volume_mixer = {
+ 	.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
+ 	.index = 0,
+-	.name = "Headset Mic Capture Volume",
++	.name = "Mic Capture Volume",
+ 	.subdevice = (HDA_SUBDEV_AMP_FLAG | HDA_SUBDEV_NID_FLAG),
+ 	.access = (SNDRV_CTL_ELEM_ACCESS_READWRITE
+ 			 | SNDRV_CTL_ELEM_ACCESS_TLV_READ),
+-- 
+2.25.1
+
