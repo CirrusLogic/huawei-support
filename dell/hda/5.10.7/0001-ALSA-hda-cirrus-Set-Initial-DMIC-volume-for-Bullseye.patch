@@ -1,0 +1,30 @@
+From ed2eb5ac44920c1c0ca529c8c3aa25017d303ee4 Mon Sep 17 00:00:00 2001
+From: Stefan Binding <sbinding@opensource.cirrus.com>
+Date: Mon, 12 Apr 2021 15:31:10 +0100
+Subject: [PATCH] ALSA: hda/cirrus: Set Initial DMIC volume for Bullseye to 16%
+
+Signed-off-by: Stefan Binding <sbinding@opensource.cirrus.com>
+Change-Id: I6ad8ca68d6d7adbd691383d5e9d7657b374d5ffa
+---
+ sound/pci/hda/patch_cirrus.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sound/pci/hda/patch_cirrus.c b/sound/pci/hda/patch_cirrus.c
+index 5d57096b3a95..d6ef51849136 100644
+--- a/sound/pci/hda/patch_cirrus.c
++++ b/sound/pci/hda/patch_cirrus.c
+@@ -2172,6 +2172,11 @@ static void cs8409_cs42l42_fixups(struct hda_codec *codec,
+ 			(get_wcaps(codec, CS8409_CS42L42_AMIC_PIN_NID) | AC_WCAP_UNSOL_CAP));
+ 		break;
+ 	case HDA_FIXUP_ACT_PROBE:
++
++		if (codec->fixup_id == CS8409_BULLSEYE)
++			/* set dmic volume to 16% (-26 dB) using direct control */
++			snd_hda_codec_write(codec, CS8409_CS42L42_DMIC_ADC_PIN_NID,
++					0, AC_VERB_SET_VOLUME_KNOB_CONTROL, 0xcb);
+ 		snd_hda_gen_add_kctl(&spec->gen,
+ 			NULL, &cs8409_cs42l42_hp_volume_mixer);
+ 		snd_hda_gen_add_kctl(&spec->gen,
+-- 
+2.25.1
+
