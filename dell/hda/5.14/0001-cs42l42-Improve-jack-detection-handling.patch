@@ -1,0 +1,102 @@
+From 77aabe0d7c833fba277e636fc158de0bdeac693e Mon Sep 17 00:00:00 2001
+From: Vitaly Rodionov <vitalyr@opensource.cirrus.com>
+Date: Tue, 31 Aug 2021 22:41:20 +0100
+Subject: [PATCH] cs42l42: Improve jack detection handling
+
+Some headsets cannot be detected with default autodetect settings.
+They are detected as headphones or optical. In order to
+support these types of headsets we have to set HSBIAS
+voltage to 2V and run jack autodetect one more time.
+
+Signed-off-by: Vitaly Rodionov <vitalyr@opensource.cirrus.com>
+---
+ sound/soc/codecs/cs42l42.c | 16 ++++++++++++----
+ sound/soc/codecs/cs42l42.h |  4 ++++
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/sound/soc/codecs/cs42l42.c b/sound/soc/codecs/cs42l42.c
+index fb1e4c33e27d..7ac7c5b1fde9 100644
+--- a/sound/soc/codecs/cs42l42.c
++++ b/sound/soc/codecs/cs42l42.c
+@@ -1182,7 +1182,7 @@ static void cs42l42_process_hs_type_detect(struct cs42l42_private *cs42l42)
+ 		(0 << CS42L42_TS_UNPLUG_SHIFT));
+ }
+ 
+-static void cs42l42_init_hs_type_detect(struct cs42l42_private *cs42l42)
++static void cs42l42_init_hs_type_detect(struct cs42l42_private *cs42l42, unsigned int hsbias)
+ {
+ 	/* Mask tip sense interrupts */
+ 	regmap_update_bits(cs42l42->regmap,
+@@ -1250,7 +1250,7 @@ static void cs42l42_init_hs_type_detect(struct cs42l42_private *cs42l42)
+ 				CS42L42_HSBIAS_CTL_MASK |
+ 				CS42L42_PDN_MIC_LVL_DET_MASK,
+ 				(0 << CS42L42_DETECT_MODE_SHIFT) |
+-				(3 << CS42L42_HSBIAS_CTL_SHIFT) |
++				(hsbias << CS42L42_HSBIAS_CTL_SHIFT) |
+ 				(1 << CS42L42_PDN_MIC_LVL_DET_SHIFT));
+ 
+ 	/* Wait for HS bias to ramp up */
+@@ -1497,12 +1497,19 @@ static irqreturn_t cs42l42_irq_thread(int irq, void *data)
+ 			case CS42L42_PLUG_OMTP:
+ 				snd_soc_jack_report(cs42l42->jack, SND_JACK_HEADSET,
+ 						    SND_JACK_HEADSET);
++				cs42l42->hs_completed = true;
+ 				break;
+ 			case CS42L42_PLUG_HEADPHONE:
+ 				snd_soc_jack_report(cs42l42->jack, SND_JACK_HEADPHONE,
+ 						    SND_JACK_HEADPHONE);
++				cs42l42->hs_completed = true;
+ 				break;
+ 			default:
++				/* Set HSBIAS voltage to 2.0V and run again */
++				if(!cs42l42->hs_completed) {
++					cs42l42_init_hs_type_detect(cs42l42, CS42L42_HSBIAS_CTRL_VOLTAGE_2V0);
++					cs42l42->hs_completed = true;
++				}
+ 				break;
+ 			}
+ 			dev_dbg(component->dev, "Auto detect done (%d)\n", cs42l42->hs_type);
+@@ -1515,7 +1522,8 @@ static irqreturn_t cs42l42_irq_thread(int irq, void *data)
+ 		case CS42L42_TS_PLUG:
+ 			if (cs42l42->plug_state != CS42L42_TS_PLUG) {
+ 				cs42l42->plug_state = CS42L42_TS_PLUG;
+-				cs42l42_init_hs_type_detect(cs42l42);
++				cs42l42->hs_completed = false;
++				cs42l42_init_hs_type_detect(cs42l42, CS42L42_HSBIAS_CTRL_VOLTAGE_2V7);
+ 			}
+ 			break;
+ 
+@@ -1538,7 +1546,7 @@ static irqreturn_t cs42l42_irq_thread(int irq, void *data)
+ 				snd_soc_jack_report(cs42l42->jack, 0,
+ 						    SND_JACK_BTN_0 | SND_JACK_BTN_1 |
+ 						    SND_JACK_BTN_2 | SND_JACK_BTN_3);
+-
++				cs42l42->hs_completed = false;
+ 				dev_dbg(component->dev, "Unplug event\n");
+ 			}
+ 			break;
+diff --git a/sound/soc/codecs/cs42l42.h b/sound/soc/codecs/cs42l42.h
+index 8734f6828f3e..49e1ad869570 100644
+--- a/sound/soc/codecs/cs42l42.h
++++ b/sound/soc/codecs/cs42l42.h
+@@ -762,6 +762,9 @@
+ #define CS42L42_PLL_LOCK_POLL_US	250
+ #define CS42L42_PLL_LOCK_TIMEOUT_US	1250
+ 
++#define CS42L42_HSBIAS_CTRL_VOLTAGE_2V7	3
++#define CS42L42_HSBIAS_CTRL_VOLTAGE_2V0	2
++
+ static const char *const cs42l42_supply_names[CS42L42_NUM_SUPPLIES] = {
+ 	"VA",
+ 	"VP",
+@@ -794,6 +797,7 @@ struct  cs42l42_private {
+ 	u8 hs_bias_ramp_time;
+ 	u8 hs_bias_sense_en;
+ 	u8 stream_use;
++	bool hs_completed;
+ };
+ 
+ #endif /* __CS42L42_H__ */
+-- 
+2.25.1
+
