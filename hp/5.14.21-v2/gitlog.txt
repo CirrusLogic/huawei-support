@@ -1,0 +1,50 @@
+d9c01c530cc5 ACPI / scan: Create platform device for CS35L41
+07bcab93946c ALSA: hda/realtek: Add support for HP Laptops
+08977fe8cfb7 ALSA: hda/realtek: Use ALC285_FIXUP_HP_GPIO_LED on another HP laptop
+68f201f9061c platform/x86: serial-multi-instantiate: Add SPI support
+35a36cbb7b1c platform/x86: serial-multi-instantiate: Reorganize I2C functions
+5e63b2ea3dfb platform/x86: i2c-multi-instantiate: Rename it for a generic serial driver name
+e612af7acef2 spi: Add API to count spi acpi resources
+87e59b36e5e2 spi: Support selection of the index of the ACPI Spi Resource before alloc
+000bee0ed70a spi: Create helper API to lookup ACPI info for spi device
+6e4d56db30a5 Revert "platform/x86: i2c-multi-instantiate: Don't create platform device for INT3515 ACPI nodes"
+5791c2648dc4 platform/x86: i2c-multi-instantiate: Use the new i2c_acpi_client_count() helper
+20a1b3acfc80 i2c: acpi: Add an i2c_acpi_client_count() helper function
+91502a9a0b0d ALSA: hda/realtek: fix speakers and micmute on HP 855 G8
+ae7abe36e352 ALSA: hda/realtek: Add CS35L41 support for Thinkpad laptops
+d3dca026375f ALSA: hda/realtek: Add support for Legion 7 16ACHg6 laptop
+85c25662d189 ALSA: hda: cs35l41: Make cs35l41_hda_remove() return void
+8c286a0f973a ALSA: hda: cs35l41: Tidyup code
+a025df02ce42 ALSA: hda: cs35l41: Make use of the helper function dev_err_probe()
+cd8abf7d04c9 ALSA: hda: cs35l41: Add missing default cases
+77dc3a6ee2eb ALSA: hda: cs35l41: Move cs35l41* calls to its own symbol namespace
+6e4320d8ecbc ALSA: hda: cs35l41: Add calls to newly added test key function
+2cb52046d186 ALSA: hda: cs35l41: Avoid overwriting register patch
+10b1a5a99c6a ALSA: hda: cs35l41: fix double free on error in probe()
+f517ba4924ad ASoC: cs35l41: Add support for hibernate memory retention mode
+d92321bbe46b ASoC: cs35l41: Update handling of test key registers
+7b2f3eb492da ALSA: hda: cs35l41: Add support for CS35L41 in HDA systems
+5f2f539901b0 ASoC: cs35l41: Correct handling of some registers in the cache
+56852cf4b217 ASoC: cs35l41: Correct DSP power down
+4e7c3cd87db8 ASoC: cs35l41: Remove incorrect comment
+dcf821319474 ASoC: cs35l41: Add cs35l51/53 IDs
+e8e4fcc047c6 ASoC: cs35l41: Create shared function for boost configuration
+3bc3e3da657f ASoC: cs35l41: Create shared function for setting channels
+8b2278604b6d ASoC: cs35l41: Create shared function for errata patches
+062ce0593315 ASoC: cs35l41: Move power initializations to reg_sequence
+fe120d4cb6f6 ASoC: cs35l41: Move cs35l41_otp_unpack to shared code
+a87d42227cf5 ASoC: cs35l41: Convert tables to shared source code
+0695ad92fe1a ASoC: cs35l41: Fix undefined reference to core functions
+a5e0091d62ab ASoC: cs35l41: Fix link problem
+872fc0b6bde8 ASoC: cs35l41: Set the max SPI speed for the whole device
+bae9e13fc55c ASoC: cs35l41: DSP Support
+a2697972b936 ASoC: cs35l41: Change monitor widgets to siggens
+ca7270a7b60d ASoC: cs35l41: Make cs35l41_remove() return void
+c6d1fa6c8f66 misc: cs35l41: Remove unused pdn variable
+4295c8cc1748 ASoC: cs35l41: Fix a bunch of trivial code formating/style issues
+3e60abeb5cb5 ASoC: cs35l41: Fixup the error messages
+e371eadf2a93 ASoC: cs35l41: Don't overwrite returned error code
+fe1024d50477 ASoC: cs35l41: Combine adjacent register writes
+3a2eb0b4b020 ASoC: cs35l41: Use regmap_read_poll_timeout to wait for OTP boot
+c2f14cc2bcdd ASoC: cs35l41: Fix use of an uninitialised variable
+6450ef559056 ASoC: cs35l41: CS35L41 Boosted Smart Amplifier
